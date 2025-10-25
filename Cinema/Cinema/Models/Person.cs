@@ -11,8 +11,16 @@ namespace Cinema.Models
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
         public DateTime BirthDate { get; set; }
+
         public DateTime EnrollmentDate { get; set; }
         public Role? role { get; set; }
+        public float GetAge()
+        {
+            var age = DateTime.Now.Year - BirthDate.Year;
+            if (DateTime.Now.DayOfYear < BirthDate.DayOfYear)
+                age--;
+            return age;
+        }
     }
     public class Client : Person
     {
