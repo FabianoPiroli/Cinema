@@ -24,5 +24,14 @@ namespace Cinema.Models
         {
             return basePrice * 0.5f; // 50% discount for students
         }
+        public bool IsAllowedEntry(int? ageRating)
+        {
+            if (ageRating == null)
+                return true;
+            if (Client == null)
+                return false;
+            var clientAge = Client.GetAge();
+            return clientAge >= ageRating;
+        }
     }
 }
