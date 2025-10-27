@@ -6,23 +6,22 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Cinema.Migrations
 {
     /// <inheritdoc />
-    public partial class Movies : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Movies",
+                name: "AgeRating",
                 columns: table => new
                 {
                     ID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Title = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    DurationInMinutes = table.Column<int>(type: "int", nullable: false)
+                    Rating = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Movies", x => x.ID);
+                    table.PrimaryKey("PK_AgeRating", x => x.ID);
                 });
 
             migrationBuilder.CreateTable(
@@ -50,6 +49,26 @@ namespace Cinema.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Rooms", x => x.ID);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Movies",
+                columns: table => new
+                {
+                    ID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DurationInMinutes = table.Column<int>(type: "int", nullable: false),
+                    AgeRatingID = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Movies", x => x.ID);
+                    table.ForeignKey(
+                        name: "FK_Movies_AgeRating_AgeRatingID",
+                        column: x => x.AgeRatingID,
+                        principalTable: "AgeRating",
+                        principalColumn: "ID");
                 });
 
             migrationBuilder.CreateTable(
@@ -170,6 +189,11 @@ namespace Cinema.Migrations
                 column: "MovieID");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Movies_AgeRatingID",
+                table: "Movies",
+                column: "AgeRatingID");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Person_MovieID",
                 table: "Person",
                 column: "MovieID");
@@ -228,6 +252,9 @@ namespace Cinema.Migrations
 
             migrationBuilder.DropTable(
                 name: "Rooms");
+
+            migrationBuilder.DropTable(
+                name: "AgeRating");
         }
     }
 }

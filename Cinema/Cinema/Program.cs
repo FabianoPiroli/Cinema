@@ -28,7 +28,7 @@ var app = builder.Build();
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    
+
     app.UseHsts();
 }
 
@@ -57,12 +57,17 @@ static void CreateDbIfNotExists(IHost host)
         try
         {
             var context = services.GetRequiredService<CinemaContext>();
+
+            // Aplica todas as migrations pendentes e cria/atualiza o esquema conforme elas
+            context.Database.Migrate();
+
+            // Seed de dados (implementar sem EnsureCreated)
             DbInitializer.Initialize(context);
         }
         catch (Exception ex)
         {
             var logger = services.GetRequiredService<ILogger<Program>>();
-            logger.LogError(ex, "An error occurred creating the DB.");
+            logger.LogError(ex, "An error occurred creating or migrating the DB.");
         }
     }
 }

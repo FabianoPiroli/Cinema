@@ -6,7 +6,9 @@ namespace Cinema.Data
     {
         public static void Initialize(CinemaContext context)
         {
-            context.Database.EnsureCreated();
+            // NÃO chamar EnsureCreated() quando usamos migrations. O Program.cs já chama Database.Migrate().
+            // context.Database.EnsureCreated();
+
             // Look for any persons.
             if (context.Persons.Any())
             {

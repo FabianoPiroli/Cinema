@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Cinema.Migrations
 {
     [DbContext(typeof(CinemaContext))]
-    [Migration("20251027222348_Movies")]
-    partial class Movies
+    [Migration("20251027225146_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,22 @@ namespace Cinema.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("Cinema.Models.AgeRating", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
+
+                    b.Property<int?>("Rating")
+                        .HasColumnType("int");
+
+                    b.HasKey("ID");
+
+                    b.ToTable("AgeRating");
+                });
 
             modelBuilder.Entity("Cinema.Models.Genre", b =>
                 {
@@ -54,6 +70,9 @@ namespace Cinema.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
 
+                    b.Property<int?>("AgeRatingID")
+                        .HasColumnType("int");
+
                     b.Property<int>("DurationInMinutes")
                         .HasColumnType("int");
 
@@ -61,6 +80,8 @@ namespace Cinema.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("ID");
+
+                    b.HasIndex("AgeRatingID");
 
                     b.ToTable("Movies");
                 });
@@ -231,6 +252,15 @@ namespace Cinema.Migrations
                     b.HasOne("Cinema.Models.Movie", null)
                         .WithMany("Genres")
                         .HasForeignKey("MovieID");
+                });
+
+            modelBuilder.Entity("Cinema.Models.Movie", b =>
+                {
+                    b.HasOne("Cinema.Models.AgeRating", "AgeRating")
+                        .WithMany()
+                        .HasForeignKey("AgeRatingID");
+
+                    b.Navigation("AgeRating");
                 });
 
             modelBuilder.Entity("Cinema.Models.Person", b =>
