@@ -1,0 +1,149 @@
+@model Cinema.Models.Ticket
+@{
+    ViewData["Title"] = "Comprar Ingresso";
+    var session = ViewBag.Session as Cinema.Models.Session;
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow">
+                <div class="card-body">
+                    <h2 class="fw-bold mb-4 text-center">
+                        <i class="fas fa-ticket-alt text-warning me-2"></i>
+                        Comprar Ingresso
+                    </h2>
+                    
+                    @if (session != null)
+                    {
+                        <div class="alert alert-info">
+                            <h5 class="fw-bold">
+                                <i class="fas fa-film me-2"></i>
+                                @session.Movie?.Title
+                            </h5>
+                            <p class="mb-1">
+                                <i class="fas fa-calendar me-1"></i>
+                                @session.StartTime.ToString("dd/MM/yyyy") às @session.StartTime.ToString("HH:mm")
+                            </p>
+                            <p class="mb-0">
+                                <i class="fas fa-door-open me-1"></i>
+                                Sala @session.Room?.RoomNumber
+                            </p>
+                        </div>
+                    }
+                    
+                    <form asp-action="Create" method="post">
+                        <input type="hidden" asp-for="Session.ID" value="@session?.ID" />
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Client.FirstName" class="form-label fw-bold">
+                                        <i class="fas fa-user me-1"></i>Nome
+                                    </label>
+                                    <input asp-for="Client.FirstName" class="form-control" required />
+                                    <span asp-validation-for="Client.FirstName" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Client.LastName" class="form-label fw-bold">
+                                        <i class="fas fa-user me-1"></i>Sobrenome
+                                    </label>
+                                    <input asp-for="Client.LastName" class="form-control" required />
+                                    <span asp-validation-for="Client.LastName" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Client.Email" class="form-label fw-bold">
+                                        <i class="fas fa-envelope me-1"></i>E-mail
+                                    </label>
+                                    <input asp-for="Client.Email" type="email" class="form-control" required />
+                                    <span asp-validation-for="Client.Email" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Client.PhoneNumber" class="form-label fw-bold">
+                                        <i class="fas fa-phone me-1"></i>Telefone
+                                    </label>
+                                    <input asp-for="Client.PhoneNumber" class="form-control" />
+                                    <span asp-validation-for="Client.PhoneNumber" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Client.CPF" class="form-label fw-bold">
+                                        <i class="fas fa-id-card me-1"></i>CPF
+                                    </label>
+                                    <input asp-for="Client.CPF" class="form-control" />
+                                    <span asp-validation-for="Client.CPF" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Price" class="form-label fw-bold">
+                                        <i class="fas fa-dollar-sign me-1"></i>Preço
+                                    </label>
+                                    <input asp-for="Price" class="form-control" value="25.00" readonly />
+                                    <span asp-validation-for="Price" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <div class="form-check">
+                                <input asp-for="Client.IsStudent" class="form-check-input" type="checkbox" id="isStudent" />
+                                <label class="form-check-label fw-bold" for="isStudent">
+                                    <i class="fas fa-graduation-cap me-1"></i>
+                                    Sou estudante (50% de desconto)
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="alert alert-warning">
+                            <h6 class="fw-bold">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Informações Importantes:
+                            </h6>
+                            <ul class="mb-0 small">
+                                <li>Chegue 15 minutos antes da sessão</li>
+                                <li>Apresente documento de identificação</li>
+                                <li>Estudantes devem apresentar carteirinha</li>
+                                <li>Ingressos não são reembolsáveis</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a asp-controller="Session" asp-action="Details" asp-route-id="@session?.ID" 
+                               class="btn btn-outline-secondary me-md-2">
+                                <i class="fas fa-arrow-left me-1"></i>Voltar
+                            </a>
+                            <button type="submit" class="btn btn-warning">
+                                <i class="fas fa-shopping-cart me-1"></i>Comprar Ingresso
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('isStudent').addEventListener('change', function() {
+    const priceInput = document.querySelector('input[name="Price"]');
+    if (this.checked) {
+        priceInput.value = '12.50'; // 50% de desconto
+    } else {
+        priceInput.value = '25.00';
+    }
+});
+</script>

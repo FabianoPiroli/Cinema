@@ -1,4 +1,6 @@
-﻿using Cinema.Models;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using Cinema.Models;
 
 namespace Cinema.Repository
 {
@@ -7,6 +9,6 @@ namespace Cinema.Repository
         public Task Create(Person person);
         public Task Update(Person person);
         public Task Delete(Person person);
-        public Task GetAll();
+        public Task<List<Person>> GetAll();
     }
 }

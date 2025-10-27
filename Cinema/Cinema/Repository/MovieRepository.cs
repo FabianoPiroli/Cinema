@@ -11,6 +11,24 @@ namespace Cinema.Repository
         {
             _context = context;
         }
+        public async Task<List<Movie>> GetAll()
+        {
+            return await _context.Movies // Verificar contexto, se é movies e tal DONKEY
+                .Include(m => m.Genres)
+                .Include(m => m.Actors)
+                .Include(m => m.Directors)
+                .ToListAsync();
+        }
+
+        public async Task<Movie?> GetById(int id)
+        {
+            return await _context.Movies
+                .Include(m => m.Genres)
+                .Include(m => m.Actors)
+                .Include(m => m.Directors)
+                .FirstOrDefaultAsync(m => m.ID == id);
+        }
+
         public async Task Create(Movie movie)
         {
             await _context.Movies.AddAsync(movie);

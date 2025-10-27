@@ -11,6 +11,34 @@ namespace Cinema.Repository
         {
             _context = context;
         }
+        public async Task<List<Session>> GetAll()
+        {
+            return await _context.Sessions
+                .Include(s => s.Movie)
+                .Include(s => s.Room)
+                .Include(s => s.Tickets)
+                .ToListAsync();
+        }
+
+        public async Task<Session?> GetById(int id)
+        {
+            return await _context.Sessions
+                .Include(s => s.Movie)
+                .Include(s => s.Room)
+                .Include(s => s.Tickets)
+                .FirstOrDefaultAsync(s => s.ID == id);
+        }
+
+        public async Task<List<Session>> GetByMovieId(int movieId)
+        {
+            return await _context.Sessions
+                .Include(s => s.Movie)
+                .Include(s => s.Room)
+                .Include(s => s.Tickets)
+                .Where(s => s.MovieID == movieId)
+                .ToListAsync();
+        }
+
         public async Task Create(Session session)
         {
             await _context.Sessions.AddAsync(session);

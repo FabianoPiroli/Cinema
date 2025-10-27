@@ -9,22 +9,24 @@ namespace Cinema.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-        private readonly IPersonRepository _personRepository;
+        private readonly IMovieRepository _movieRepository;
+        private readonly ISessionRepository _sessionRepository;
 
         public HomeController(
-            ILogger<HomeController> logger, IPersonRepository personRepository)
+            ILogger<HomeController> logger, IMovieRepository movieRepository, ISessionRepository sessionRepository)
         {
             _logger = logger;
-            _personRepository = personRepository;
-
+            _movieRepository = movieRepository;
+            _sessionRepository = sessionRepository;
         }
+        
         public async Task<IActionResult> Index()
         {
-            return View(await _personRepository.GetAll());
-        }
-
-        public IActionResult Index()
-        {
+            var movies = await _movieRepository.GetAll();
+            var sessions = await _sessionRepository.GetAll();
+            
+            ViewBag.Movies = movies;
+            ViewBag.Sessions = sessions;
             return View();
         }
 

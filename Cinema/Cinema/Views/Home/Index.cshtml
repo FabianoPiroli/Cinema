@@ -1,8 +1,184 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Início";
+    var movies = ViewBag.Movies as List<Cinema.Models.Movie>;
+    var sessions = ViewBag.Sessions as List<Cinema.Models.Session>;
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<!-- Hero Section -->
+<section class="hero-section bg-dark text-white py-5 mb-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="display-4 fw-bold mb-4">
+                    <i class="fas fa-film text-warning me-3"></i>
+                    Bem-vindo ao CineMax
+                </h1>
+                <p class="lead mb-4">Descubra os melhores filmes em cartaz e garante já seu ingresso para uma experiência cinematográfica única.</p>
+                <a href="#movies" class="btn btn-warning btn-lg me-3">
+                    <i class="fas fa-play me-2"></i>Ver Filmes em Cartaz
+                </a>
+                <a asp-controller="Movie" asp-action="Index" class="btn btn-outline-light btn-lg">
+                    <i class="fas fa-search me-2"></i>Buscar Filmes
+                </a>
+            </div>
+            <div class="col-lg-6 text-center">
+                <i class="fas fa-video fa-10x text-warning opacity-50"></i>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Movies Section -->
+<section id="movies" class="py-5">
+    <div class="container">
+        <div class="row mb-5">
+            <div class="col-12 text-center">
+                <h2 class="display-5 fw-bold mb-3">
+                    <i class="fas fa-star text-warning me-2"></i>
+                    Filmes em Cartaz
+                </h2>
+                <p class="text-muted">Confira nossa programação atual</p>
+            </div>
+        </div>
+
+        @if (movies != null && movies.Any())
+        {
+            <div class="row">
+                @foreach (var movie in movies.Take(6))
+                {
+                    <div class="col-lg-4 col-md-6 mb-4">
+                        <div class="card movie-card h-100 shadow-sm">
+                            <div class="card-img-top bg-dark d-flex align-items-center justify-content-center" style="height: 300px;">
+                                <i class="fas fa-film fa-4x text-warning"></i>
+                            </div>
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title fw-bold">@movie.Title</h5>
+                                <p class="card-text text-muted">
+                                    <i class="fas fa-clock me-1"></i>
+                                    @movie.DurationInMinutes minutos
+                                </p>
+                                @if (movie.Genres != null && movie.Genres.Any())
+                                {
+                                    <div class="mb-3">
+                                        @foreach (var genre in movie.Genres.Take(3))
+                                        {
+                                            <span class="badge bg-warning text-dark me-1">@genre.Name</span>
+                                        }
+                                    </div>
+                                }
+                                <div class="mt-auto">
+                                    <a asp-controller="Movie" asp-action="Details" asp-route-id="@movie.ID" 
+                                       class="btn btn-outline-warning w-100">
+                                        <i class="fas fa-info-circle me-1"></i>Ver Detalhes
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="text-center py-5">
+                <i class="fas fa-film fa-4x text-muted mb-3"></i>
+                <h4 class="text-muted">Nenhum filme em cartaz no momento</h4>
+                <p class="text-muted">Volte em breve para conferir nossa programação!</p>
+            </div>
+        }
+    </div>
+</section>
+
+<!-- Sessions Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row mb-5">
+            <div class="col-12 text-center">
+                <h2 class="display-5 fw-bold mb-3">
+                    <i class="fas fa-clock text-warning me-2"></i>
+                    Próximas Sessões
+                </h2>
+                <p class="text-muted">Horários disponíveis para hoje</p>
+            </div>
+        </div>
+
+        @if (sessions != null && sessions.Any())
+        {
+            <div class="row">
+                @foreach (var session in sessions.Take(4))
+                {
+                    <div class="col-lg-3 col-md-6 mb-4">
+                        <div class="card session-card h-100 shadow-sm">
+                            <div class="card-body text-center">
+                                <h6 class="card-title fw-bold">@session.Movie?.Title</h6>
+                                <p class="card-text text-muted mb-2">
+                                    <i class="fas fa-clock me-1"></i>
+                                    @session.StartTime.ToString("HH:mm")
+                                </p>
+                                <p class="card-text text-muted mb-3">
+                                    <i class="fas fa-door-open me-1"></i>
+                                    Sala @session.Room?.RoomNumber
+                                </p>
+                                <a asp-controller="Ticket" asp-action="Create" asp-route-sessionId="@session.ID" 
+                                   class="btn btn-warning btn-sm w-100">
+                                    <i class="fas fa-ticket-alt me-1"></i>Comprar Ingresso
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="text-center py-5">
+                <i class="fas fa-clock fa-4x text-muted mb-3"></i>
+                <h4 class="text-muted">Nenhuma sessão disponível</h4>
+                <p class="text-muted">Confira nossa programação de filmes!</p>
+            </div>
+        }
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 text-center mb-5">
+                <h2 class="display-5 fw-bold mb-3">
+                    <i class="fas fa-star text-warning me-2"></i>
+                    Por que escolher o CineMax?
+                </h2>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="text-center">
+                    <div class="feature-icon bg-warning text-dark rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                        <i class="fas fa-video fa-2x"></i>
+                    </div>
+                    <h5 class="fw-bold">Melhor Qualidade</h5>
+                    <p class="text-muted">Projeção digital 4K e som surround para uma experiência imersiva.</p>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="text-center">
+                    <div class="feature-icon bg-warning text-dark rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                        <i class="fas fa-ticket-alt fa-2x"></i>
+                    </div>
+                    <h5 class="fw-bold">Ingressos Online</h5>
+                    <p class="text-muted">Compre seus ingressos online e evite filas na bilheteria.</p>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="text-center">
+                    <div class="feature-icon bg-warning text-dark rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                        <i class="fas fa-graduation-cap fa-2x"></i>
+                    </div>
+                    <h5 class="fw-bold">Desconto Estudante</h5>
+                    <p class="text-muted">50% de desconto para estudantes em todos os filmes.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
