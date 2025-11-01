@@ -1,0 +1,3 @@
+Fiz um front end voltado pra aplicação de usuario e adm, entretanto preciso que se torne apenas pra adm, fazendo que seja possivel realizar a incrementação de filmes em cartaz.
+as sessões para que eu possa colocar quando e que hora irá possuir sessões de tal filme e os ingressos fazendo com que na eu possa vender na hora, digamos um cliente veio e pediu ingresso
+para tal filme vou la escolho o filme em cartaz e vendo o ingresso na hora, digamos fique uma aplicação web apenas para o adm e vendedor.
