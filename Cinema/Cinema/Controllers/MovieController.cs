@@ -2,6 +2,7 @@ using Cinema.Models;
 using Cinema.Repository;
 using Microsoft.AspNetCore.Mvc;
 
+
 namespace Cinema.Controllers
 {
     public class MovieController : Controller
@@ -19,6 +20,22 @@ namespace Cinema.Controllers
         {
             var movies = await _movieRepository.GetAll();
             return View(movies);
+        }
+        [HttpGet]
+        public IActionResult Create()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Create(Movie movie)
+        {
+            if(ModelState.IsValid)
+            {
+                await _movieRepository.Create(movie);
+                return RedirectToAction("Index");
+            }
+            return View(movie);
         }
 
         public async Task<IActionResult> Details(int id)

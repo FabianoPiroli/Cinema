@@ -1,0 +1,75 @@
+﻿@model Cinema.Models.Movie
+
+@{
+    ViewData["Title"] = "Filmes";
+}
+
+<div class="text-center">
+    <h1 >Adicionar Filme</h1>
+    <hr />
+</div>
+
+<div class="container">
+
+    <div class="mx-auto">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly"
+                 class="text-danger"></div>
+
+            <div class="form-group">
+                <label class="control-label">Título</label>
+                <input asp-for="Title"
+                       class="form-control" />
+                <span asp-validation-for="Title"
+                      class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label">Indicação de Idade</label>
+                <input asp-for="AgeRating"
+                       class="form-control" />
+                <span asp-validation-for="AgeRating"
+                      class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label">Gênero</label>
+                <input asp-for="Genres"
+                       class="form-control" />
+                <span asp-validation-for="Genres"
+                      class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label">Atores</label>
+                <input asp-for="Actors"
+                       class="form-control" />
+                <span asp-validation-for="Actors"
+                      class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label">Diretores</label>
+                <input asp-for="Directors"
+                       class="form-control" />
+                <span asp-validation-for="Directors"
+                      class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label">Duração do Filme:</label>
+                <input asp-for="DurationInMinutes"
+                       class="form-control" />
+                <span asp-validation-for="DurationInMinutes"
+                      class="text-danger"></span>
+            </div>
+
+            <br />
+
+            <div class="form-group">
+                <input type="submit" value="Salvar"
+                       class="btn btn-warning btn-lg" />
+            </div>
+        </form>
+    </div>
+</div>
