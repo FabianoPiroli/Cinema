@@ -8,16 +8,23 @@ namespace Cinema.Models
     {
         [Key]
         public int ID { get; set; }
+
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
-        public DateTime BirthDate { get; set; }
 
-        public DateTime EnrollmentDate { get; set; }
+        // Alterado para DateOnly para armazenar apenas a data (sem hora)
+        public DateOnly BirthDate { get; set; }
+
+        // Alterado para DateOnly para armazenar apenas a data (sem hora)
+        public DateOnly EnrollmentDate { get; set; }
+
         public Role? role { get; set; }
+
         public float GetAge()
         {
-            var age = DateTime.Now.Year - BirthDate.Year;
-            if (DateTime.Now.DayOfYear < BirthDate.DayOfYear)
+            var today = DateOnly.FromDateTime(DateTime.Now);
+            var age = today.Year - BirthDate.Year;
+            if (today < BirthDate.AddYears(age))
                 age--;
             return age;
         }

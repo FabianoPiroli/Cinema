@@ -1,0 +1,132 @@
+@model IEnumerable<Cinema.Models.Person>
+
+@{
+    ViewData["Title"] = "Pessoas";
+}
+
+<div class="container py-5">
+    <div class="row mb-5">
+        <div class="col-12 text-center">
+            <h1 class="display-4 fw-bold mb-3">
+                <i class="fas fa-user text-warning me-3"></i>
+                Pessoas Cadastradas
+            </h1>
+        </div>
+    </div>
+
+    <!-- Barra de Pesquisa -->
+    <div class="row mb-5">
+        <div class="col-lg-6 mx-auto">
+            <form asp-action="Search" method="get" class="d-flex">
+                <div class="input-group">
+                    <input type="text" name="query" class="form-control form-control-lg" 
+                           placeholder="Buscar pessoas..." 
+                           value="@ViewBag.SearchQuery" />
+                    <button class="btn btn-warning btn-lg" type="submit">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    @if (ViewBag.SearchQuery != null)
+    {
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="alert alert-info">
+                    <i class="fas fa-search me-2"></i>
+                    Resultados para: <strong>"@ViewBag.SearchQuery"</strong>
+                    <a asp-action="Index" class="btn btn-sm btn-outline-secondary ms-3">
+                        <i class="fas fa-times me-1"></i>Limpar busca
+                    </a>
+                </div>
+            </div>
+        </div>
+    }
+
+    @if (Model != null && Model.Any())
+    {
+        <div class="row">
+            <div class="col-12">
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover mb-3 align-middle small">
+                        <thead class="table-light">
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Nome</th>
+                                <th scope="col">Papel</th>
+                                <th scope="col">Nascimento</th>
+                                <th scope="col">Matrícula</th>
+                                <th scope="col">Idade</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var person in Model)
+                            {
+                                <tr>
+                                    <th scope="row">@person.ID</th>
+                                    <td>
+                                        <div class="fw-bold">@person.FirstName @person.LastName</div>
+                                        @* Verifica se é Client para exibir informações adicionais *@
+                                        @if (person is Cinema.Models.Client client)
+                                        {
+                                            <div class="text-muted small">
+                                                CPF: @(client.CPF?.ToString() ?? "-") ·
+                                                Email: @(string.IsNullOrWhiteSpace(client.Email) ? "-" : client.Email) ·
+                                                Tel: @(client.PhoneNumber?.ToString() ?? "-") ·
+                                                Estudante: @(client.IsStudent ? "Sim" : "Não")
+                                            </div>
+                                        }
+                                    </td>
+                                    <td>@(person.role?.Name ?? "-")</td>
+                                    <td>
+                                        @if (person.BirthDate != null)
+                                        {
+                                            @person.BirthDate.ToString("dd/MM/yyyy")
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">-</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (person.EnrollmentDate != null)
+                                        {
+                                            @person.EnrollmentDate.ToString("dd/MM/yyyy")
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">-</span>
+                                        }
+                                    </td>
+                                    <td>Idade: @person.GetAge()</td>
+                                    <td class="text-end">
+                                        <a asp-action="Update" asp-route-id="@person.ID" class="btn btn-sm btn-outline-primary me-1" title="Editar">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <form asp-action="Delete" asp-route-id="@person.ID" method="post" class="d-inline">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Remover" onclick="return confirm('Remover esta pessoa?');">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="text-center py-5">
+            <i class="fas fa-film fa-4x text-muted mb-3"></i>
+            <h4 class="text-muted">Nenhum usuário adicionado.</h4>
+        </div>
+    }
+    <a asp-controller="Person" asp-action="Create" class="btn btn-warning btn-lg">
+        Adicionar
+    </a>
+</div>

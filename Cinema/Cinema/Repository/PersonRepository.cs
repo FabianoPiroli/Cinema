@@ -34,18 +34,31 @@ namespace Cinema.Repository
         public async Task<Person?> GetById(int personId)
         {
             return await _context.Persons
-                .Include(p => p.role) // carrega a role se existir
+                .Include(p => p.role)
                 .FirstOrDefaultAsync(p => p.ID == personId);
         }
 
-        // Retorna todos as pessoas
+        // Retorna todas as pessoas
         public async Task<List<Person>> GetAll()
         {
             return await _context.Persons
                 .Include(p => p.role)
+                .ToListAsync(); 
+        }
+
+        // Retorna pessoas cujo nome ou sobrenome contenha a string fornecida
+        public async Task<List<Person>> GetByName(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Nome não pode ser nulo ou vazio.", nameof(name));
+            return await _context.Persons
+                .Include(p => p.role)
+                .Where(p => (p.FirstName != null && p.FirstName.Contains(name)) ||
+                            (p.LastName != null && p.LastName.Contains(name)) ||
+                            ((p.FirstName != null && p.LastName != null) && (p.FirstName + " " + p.LastName).Contains(name)))
                 .ToListAsync();
         }
 
+        // Atualiza uma pessoa existente
         public async Task Update(Person person)
         {
             if (person is null) throw new ArgumentNullException(nameof(person));
