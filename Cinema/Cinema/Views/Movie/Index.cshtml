@@ -12,8 +12,13 @@
                 Filmes em Cartaz
             </h1>
         </div>
+        <div class="text-center">
+            <a asp-controller="Movie" asp-action="Create" class="btn btn-warning btn-lg">
+                Adicionar
+            </a>
+        </div>
     </div>
-
+    
     <!-- Search Bar -->
     <div class="row mb-5">
         <div class="col-lg-6 mx-auto">
@@ -94,9 +99,6 @@
         <div class="text-center py-5">
             <i class="fas fa-film fa-4x text-muted mb-3"></i>
             <h4 class="text-muted">Nenhum filme em cartaz no momento</h4>
-            <a asp-controller="Movie" asp-action="Create" class="btn btn-warning btn-lg">
-                Adicionar
-            </a>
         </div>
     }
 </div>

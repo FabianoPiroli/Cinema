@@ -1,4 +1,4 @@
-@model IEnumerable<Cinema.Models.Person>
+@model ICollection<Cinema.Models.Person>
 
 @{
     ViewData["Title"] = "Pessoas";
@@ -11,6 +11,11 @@
                 <i class="fas fa-user text-warning me-3"></i>
                 Pessoas Cadastradas
             </h1>
+        </div>
+        <div class="text-center">
+            <a asp-controller="Person" asp-action="Create" class="btn btn-warning btn-lg">
+                Adicionar
+            </a>
         </div>
     </div>
 
@@ -126,7 +131,4 @@
             <h4 class="text-muted">Nenhum usuário adicionado.</h4>
         </div>
     }
-    <a asp-controller="Person" asp-action="Create" class="btn btn-warning btn-lg">
-        Adicionar
-    </a>
 </div>

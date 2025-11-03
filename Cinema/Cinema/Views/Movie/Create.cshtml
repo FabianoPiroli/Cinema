@@ -12,7 +12,8 @@
 <div class="container">
 
     <div class="mx-auto">
-        <form asp-action="Create">
+        <form asp-action="Create" method="post">
+            @Html.AntiForgeryToken()
             <div asp-validation-summary="ModelOnly"
                  class="text-danger"></div>
 
@@ -25,11 +26,11 @@
             </div>
 
             <div class="form-group">
-                <label class="control-label">Indicação de Idade</label>
-                <input asp-for="AgeRating"
-                       class="form-control" />
-                <span asp-validation-for="AgeRating"
-                      class="text-danger"></span>
+                <label class="control-label">Indicação de Idade:</label>
+                <select asp-for="AgeRating" asp-items="ViewBag.AgeRating" class="form-control">
+                    <option value="">-- Selecionar --</option>
+                </select>
+                <span asp-validation-for="AgeRating" class="text-danger"></span>
             </div>
 
             <div class="form-group">
@@ -41,27 +42,27 @@
             </div>
 
             <div class="form-group">
-                <label class="control-label">Atores</label>
-                <input asp-for="Actors"
-                       class="form-control" />
-                <span asp-validation-for="Actors"
-                      class="text-danger"></span>
+                <label class="control-label">Atores:</label>
+                <select asp-for="Actors" asp-items="ViewBag.Actors" class="form-control">
+                    <option value="">-- Selecionar --</option>
+                </select>
+                <span asp-validation-for="Actors" class="text-danger"></span>
             </div>
 
             <div class="form-group">
-                <label class="control-label">Diretores</label>
-                <input asp-for="Directors"
-                       class="form-control" />
-                <span asp-validation-for="Directors"
-                      class="text-danger"></span>
+                <label class="control-label">Diretores:</label>
+                <select asp-for="Directors" asp-items="ViewBag.Directors" class="form-control">
+                    <option value="">-- Selecionar --</option>
+                </select>
+                <span asp-validation-for="Directors" class="text-danger"></span>
             </div>
 
             <div class="form-group">
-                <label class="control-label">Duração do Filme:</label>
+                <label class="control-label">Duração do Filme (minutos):</label>
                 <input asp-for="DurationInMinutes"
                        class="form-control" />
                 <span asp-validation-for="DurationInMinutes"
-                      class="text-danger"></span>
+                      class="number"></span>
             </div>
 
             <br />
@@ -73,3 +74,11 @@
         </form>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        $(function () {
+            $('.selectpicker').selectpicker();
+        });
+    </script>
+}

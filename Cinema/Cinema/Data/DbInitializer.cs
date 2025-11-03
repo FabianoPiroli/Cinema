@@ -7,13 +7,43 @@ namespace Cinema.Data
         public static void Initialize(CinemaContext context)
         {
             // NÃO chamar EnsureCreated() quando usamos migrations. O Program.cs já chama Database.Migrate().
-            // context.Database.EnsureCreated();
+
+            // Seed Roles se vazio
+            if (!context.Roles.Any())
+            {
+                var roles = new Role[]
+                {
+                    new Role { Name = "Ator" },
+                    new Role { Name = "Diretor" },
+                    new Role { Name = "Cliente" }
+                };
+                context.Roles.AddRange(roles);
+                context.SaveChanges();
+            }
+
+            // Seed AgeRating se vazio
+            // Usar context.Set<AgeRating>() para não depender de uma propriedade DbSet chamada AgeRating
+            if (!context.Set<AgeRating>().Any())
+            {
+                var ages = new AgeRating[]
+                {
+                    new AgeRating { Rating = "Livre" },
+                    new AgeRating { Rating = "10" },
+                    new AgeRating { Rating = "12" },
+                    new AgeRating { Rating = "14" },
+                    new AgeRating { Rating = "16" },
+                    new AgeRating { Rating = "18" }
+                };
+                context.Set<AgeRating>().AddRange(ages);
+                context.SaveChanges();
+            }
 
             // Look for any persons.
             if (context.Persons.Any())
             {
                 return;   // DB has been seeded
             }
+
             var persons = new Person[]
             {
                 new Person{FirstName="Carson", LastName="Alexander", BirthDate=DateOnly.Parse("2005-09-01")},
@@ -25,10 +55,19 @@ namespace Cinema.Data
                 new Person{FirstName="Laura", LastName="Norman", BirthDate=DateOnly.Parse("2003-09-01")},
                 new Person{FirstName="Nino", LastName="Olivetto", BirthDate=DateOnly.Parse("2005-09-01")}
             };
-            foreach (Person s in persons)
+
+            foreach (var p in persons)
             {
-                context.Persons.Add(s);
+                bool exists = context.Persons.Any(x =>
+                    x.FirstName == p.FirstName &&
+                    x.LastName == p.LastName &&
+                    x.BirthDate == p.BirthDate);
+                if (!exists)
+                {
+                    context.Persons.Add(p);
+                }
             }
+
             context.SaveChanges();
         }
     }

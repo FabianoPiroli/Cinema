@@ -54,6 +54,7 @@ static void CreateDbIfNotExists(IHost host)
     using (var scope = host.Services.CreateScope())
     {
         var services = scope.ServiceProvider;
+        var logger = services.GetRequiredService<ILogger<Program>>();
         try
         {
             var context = services.GetRequiredService<CinemaContext>();
@@ -63,10 +64,10 @@ static void CreateDbIfNotExists(IHost host)
 
             // Seed de dados (implementar sem EnsureCreated)
             DbInitializer.Initialize(context);
+            logger.LogInformation("Database migrated and seeded.");
         }
         catch (Exception ex)
         {
-            var logger = services.GetRequiredService<ILogger<Program>>();
             logger.LogError(ex, "An error occurred creating or migrating the DB.");
         }
     }

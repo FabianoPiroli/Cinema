@@ -11,7 +11,11 @@
                 <i class="fas fa-ticket-alt text-warning me-3"></i>
                 Meus Ingressos
             </h1>
-            <p class="lead text-muted">Gerencie seus ingressos comprados</p>
+        </div>
+        <div class="text-center">
+            <a asp-controller="Ticket" asp-action="Create" class="btn btn-warning btn-lg">
+                Adicionar
+            </a>
         </div>
     </div>
 
@@ -80,8 +84,7 @@
     {
         <div class="text-center py-5">
             <i class="fas fa-ticket-alt fa-4x text-muted mb-3"></i>
-            <h4 class="text-muted">Você ainda não possui ingressos</h4>
-            <p class="text-muted">Que tal conferir nossos filmes em cartaz?</p>
+            <h4 class="text-muted">Nenhum ingresso no momento.</h4>
             <a asp-controller="Movie" asp-action="Index" class="btn btn-warning">
                 <i class="fas fa-film me-1"></i>Ver Filmes
             </a>

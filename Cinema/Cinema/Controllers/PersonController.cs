@@ -1,6 +1,7 @@
 ﻿using Cinema.Models;
 using Cinema.Repository;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
@@ -9,29 +10,38 @@ namespace Cinema.Controllers
 {
     public class PersonController : Controller
     {
-        private readonly ILogger<PersonController> _logger; // Variaveis privadas sempre tem _(underline) no inicio por convenção (boas práticas)
+        private readonly ILogger<PersonController> _logger;
         private readonly IPersonRepository _personRepository;
         private readonly CinemaContext _context;
-        public PersonController
-            (ILogger<PersonController> logger,
-            IPersonRepository personRepository,
-            CinemaContext context
-        )
+
+        public PersonController(ILogger<PersonController> logger,
+                                IPersonRepository personRepository,
+                                CinemaContext context)
         {
             _logger = logger;
             _personRepository = personRepository;
             _context = context;
         }
 
-        [HttpGet]
         public async Task<IActionResult> Index()
         {
-            return View(await _personRepository.GetAll());
+            var persons = await _personRepository.GetAll();
+            return View(persons);
+        }
+
+
+        // Helper para popular a ViewBag com SelectList
+        private async Task PopulateRolesAsync()
+        {
+            var roles = await _context.Roles.OrderBy(r => r.Name).ToListAsync();
+            // usamos Name como value e text para manter compatibilidade com código que lê o nome
+            ViewBag.role = new SelectList(roles, "Name", "Name");
         }
 
         [HttpGet]
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
+            await PopulateRolesAsync();
             return View();
         }
 
@@ -40,7 +50,10 @@ namespace Cinema.Controllers
         public async Task<IActionResult> Create(Person person)
         {
             if (!ModelState.IsValid)
+            {
+                await PopulateRolesAsync(); // repopula quando houver erro de validação
                 return View(person);
+            }
 
             var roleValue = (Request.Form["role"].ToString() ?? "").Trim();
 
@@ -101,14 +114,11 @@ namespace Cinema.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Update(int id)
+        public IActionResult Update(int personId)
         {
-            var person = await _personRepository.GetById(id);
-            if (person == null)
-            {
-                return NotFound();
-            }
-            return View(person);
+            var model = _context.Persons.Include(p => p.role).FirstOrDefault(p => p.ID == personId);
+            ViewBag.role = new SelectList(_context.Roles.ToList(), "ID", "Name", model?.role?.ID);
+            return View(model);
         }
 
         [HttpPost]
