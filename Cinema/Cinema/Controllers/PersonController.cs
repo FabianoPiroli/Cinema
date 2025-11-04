@@ -114,10 +114,18 @@ namespace Cinema.Controllers
         }
 
         [HttpGet]
-        public IActionResult Update(int personId)
+        public IActionResult Update(int id)
         {
-            var model = _context.Persons.Include(p => p.role).FirstOrDefault(p => p.ID == personId);
-            ViewBag.role = new SelectList(_context.Roles.ToList(), "ID", "Name", model?.role?.ID);
+            var model = _context.Persons
+                                .Include(p => p.role)
+                                .FirstOrDefault(p => p.ID == id);
+
+            if (model == null)
+            {
+                return NotFound();
+            }
+
+            ViewBag.role = new SelectList(_context.Roles.ToList(), "ID", "Name", model.role?.ID);
             return View(model);
         }
 
