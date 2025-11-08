@@ -2,22 +2,45 @@
 
 @{
     ViewData["Title"] = "Pessoas";
-    var isClient = Model != null
-                   && Model.role != null
-                   && Model.role.Name == "Cliente";
+    var isClient = Model != null && Model.IsClient == true;
+    var roles = (IEnumerable<Cinema.Models.Role>?)ViewBag.RolesList ?? Enumerable.Empty<Cinema.Models.Role>();
+
+    string? cpfFormatted = null;
+    string? phoneFormatted = null;
+    if (!string.IsNullOrWhiteSpace(Model?.CPF))
+    {
+        var d = System.Text.RegularExpressions.Regex.Replace(Model.CPF!, "\\D", "");
+        if (d.Length == 11)
+            cpfFormatted = d.Substring(0, 3) + "." + d.Substring(3, 3) + "." + d.Substring(6, 3) + "-" + d.Substring(9, 2);
+        else
+            cpfFormatted = Model.CPF;
+    }
+    if (!string.IsNullOrWhiteSpace(Model?.PhoneNumber))
+    {
+        var d = System.Text.RegularExpressions.Regex.Replace(Model.PhoneNumber!, "\\D", "");
+        if (d.Length == 10)
+            phoneFormatted = $"({d.Substring(0,2)}) {d.Substring(2,4)}-{d.Substring(6)}";
+        else if (d.Length == 11)
+            phoneFormatted = $"({d.Substring(0,2)}) {d.Substring(2,5)}-{d.Substring(7)}";
+        else
+            phoneFormatted = Model.PhoneNumber;
+    }
 }
 
 <div class="text-center">
-    <h1>Adicionar Pessoa</h1>
+    <h1>Editar Pessoa</h1>
     <hr />
 </div>
 
 <div class="container">
     <div class="mx-auto">
-        <form asp-action="Update"
+        <form asp-action="Update" method="post"
               id="personForm"
               asp-route-personId="@Model.ID">
+            @Html.AntiForgeryToken()
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <input asp-for="ID" type="hidden" />
 
             <div class="form-group">
                 <label class="control-label">Primeiro Nome</label>
@@ -44,32 +67,40 @@
             </div>
 
             <div class="form-group">
-                <label class="control-label">Papel</label>
-                <!-- bind to role.ID (valor primitivo); ViewBag.role deve ser SelectList(ID, Name, selectedId) -->
-                <select id="roleSelect" asp-for="role.ID" asp-items="ViewBag.role" class="form-control">
-                    <option value="">-- Selecionar --</option>
-                </select>
-                <span asp-validation-for="role.ID" class="text-danger"></span>
+                <label class="control-label">Papel (selecione um ou mais)</label>
+                <div>
+                    @foreach (var role in roles)
+                    {
+                        var isChecked = Model?.Roles?.Any(r => r.ID == role.ID) == true;
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input role-checkbox" type="checkbox" name="selectedRoles" value="@role.ID" id="role_@role.ID" data-name="@role.Name" @(isChecked ? "checked" : "") />
+                            <label class="form-check-label" for="role_@role.ID">@role.Name</label>
+                        </div>
+                    }
+                </div>
             </div>
 
+            <!-- Campos adicionais que aparecem apenas quando role == "Cliente" -->
             <div id="clientFields" style="display:@(isClient ? "block" : "none"); margin-top:15px;">
                 <h4>Informações adicionais (Cliente)</h4>
 
                 <div class="form-group">
                     <label>CPF</label>
-                    <input type="tel" id="CPF" name="CPF" class="form-control" placeholder="000.000.000-00" maxlength="14" pattern="\d{3}\.\d{3}\.\d{3}-\d{2}" />
+                    <!-- agora o value é preenchido com o CPF existente (formatado quando possível) -->
+                    <input type="tel" id="CPF" name="CPF" class="form-control" placeholder="000.000.000-00" maxlength="14" pattern="\d{3}\.\d{3}\.\d{3}-\d{2}" value="@(cpfFormatted ?? "")" />
                 </div>
 
                 <div class="form-group">
                     <label>Email</label>
-                    <input type="text" name="Email" class="form-control" placeholder="Email" />
+                    <input type="text" id="Email" name="Email" class="form-control" placeholder="Email" value="@(Model?.Email ?? "")" />
                 </div>
 
                 <div class="form-group">
                     <label>Telefone</label>
-                    <input type="tel" id="PhoneNumber" name="PhoneNumber" class="form-control" placeholder="(00) 00000-0000" maxlength="15" pattern="\(\d{2}\) \d{4,5}-\d{4}" />
+                    <!-- value preenchido com telefone existente (formatado quando possível) -->
+                    <input type="tel" id="PhoneNumber" name="PhoneNumber" class="form-control" placeholder="(00) 00000-0000" maxlength="15" pattern="\(\d{2}\) \d{4,5}-\d{4}" value="@(phoneFormatted ?? "")" />
                 </div>
-            </div>
+            </div> <!-- fechado corretamente -->
 
             <br />
 
@@ -83,25 +114,32 @@
 @section Scripts {
     <script>
         (function () {
-            var roleEl = document.getElementById('roleSelect');
             var clientFields = document.getElementById('clientFields');
-            if (roleEl && clientFields) {
-                roleEl.addEventListener('change', function (e) {
-                    // use the selected option's text to decide if é Cliente
-                    var sel = e.target.options[e.target.selectedIndex];
-                    var selectedText = (sel && sel.text || '').trim();
-                    if (selectedText === 'Cliente') {
-                        clientFields.style.display = 'block';
-                    } else {
-                        clientFields.style.display = 'none';
-                        Array.prototype.forEach.call(clientFields.querySelectorAll('input'), function (inp) {
-                            inp.value = '';
-                        });
-                    }
+            var checkboxes = document.querySelectorAll('.role-checkbox');
+
+            function updateClientFields() {
+                if (!clientFields) return;
+                var hasCliente = Array.prototype.slice.call(checkboxes || []).some(function (cb) {
+                    var name = (cb.dataset && cb.dataset.name || '').trim().toLowerCase();
+                    return name === 'cliente' && cb.checked;
                 });
+                if (hasCliente) {
+                    clientFields.style.display = 'block';
+                } else {
+                    clientFields.style.display = 'none';
+                    Array.prototype.forEach.call(clientFields.querySelectorAll('input'), function (inp) {
+                        inp.value = '';
+                    });
+                }
             }
 
-            // restante do script (formatadores) permanece igual...
+            Array.prototype.forEach.call(checkboxes, function (cb) {
+                cb.addEventListener('change', updateClientFields);
+            });
+
+            // refletir seleção inicial
+            updateClientFields();
+
             var cpfEl = document.getElementById('CPF');
             var phoneEl = document.getElementById('PhoneNumber');
             function formatCPF(value) { if (!value) return ''; var v = value.replace(/\D/g, '').slice(0, 11); v = v.replace(/(\d{3})(\d)/, '$1.$2'); v = v.replace(/(\d{3})(\d)/, '$1.$2'); v = v.replace(/(\d{3})(\d{1,2})$/, '$1-$2'); return v; }

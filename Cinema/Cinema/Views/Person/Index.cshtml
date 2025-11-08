@@ -1,4 +1,5 @@
-@model ICollection<Cinema.Models.Person>
+@using System.Linq
+@model IEnumerable<Cinema.Models.Person>
 
 @{
     ViewData["Title"] = "Pessoas";
@@ -19,7 +20,6 @@
         </div>
     </div>
 
-    <!-- Barra de Pesquisa -->
     <div class="row mb-5">
         <div class="col-lg-6 mx-auto">
             <form asp-action="Search" method="get" class="d-flex">
@@ -60,10 +60,11 @@
                             <tr>
                                 <th scope="col">#</th>
                                 <th scope="col">Nome</th>
-                                <th scope="col">Papel</th>
+                                <th scope="col">Papel(is)</th>
                                 <th scope="col">Nascimento</th>
                                 <th scope="col">Matrícula</th>
                                 <th scope="col">Idade</th>
+                                <th></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -73,37 +74,32 @@
                                     <th scope="row">@person.ID</th>
                                     <td>
                                         <div class="fw-bold">@person.FirstName @person.LastName</div>
-                                        @* Verifica se é Client para exibir informações adicionais *@
-                                        @if (person is Cinema.Models.Client client)
-                                        {
-                                            <div class="text-muted small">
-                                                CPF: @(client.CPF?.ToString() ?? "-") ·
-                                                Email: @(string.IsNullOrWhiteSpace(client.Email) ? "-" : client.Email) ·
-                                                Tel: @(client.PhoneNumber?.ToString() ?? "-") ·
-                                                Estudante: @(client.IsStudent ? "Sim" : "Não")
-                                            </div>
-                                        }
-                                    </td>
-                                    <td>@(person.role?.Name ?? "-")</td>
-                                    <td>
-                                        @if (person.BirthDate != null)
-                                        {
-                                            @person.BirthDate.ToString("dd/MM/yyyy")
-                                        }
-                                        else
-                                        {
-                                            <span class="text-muted">-</span>
+                                        @* Exibe informações adicionais se for cliente *@
+                                        @if (person.IsClient == true)
+                                            {
+                                                <div class="text-muted small">
+                                                    CPF: @(person.CPF?.ToString() ?? "-") ·
+                                                    Email: @(string.IsNullOrWhiteSpace(person.Email) ? "-" : person.Email) ·
+                                                    Tel: @(person.PhoneNumber?.ToString() ?? "-") ·
+                                                </div>
+                                            }
                                         }
                                     </td>
                                     <td>
-                                        @if (person.EnrollmentDate != null)
-                                        {
-                                            @person.EnrollmentDate.ToString("dd/MM/yyyy")
+                                        @{
+                                            var rolesHtml = "-";
+                                            if (person.Roles != null && person.Roles.Any())
+                                            {
+                                                rolesHtml = string.Join("<br/>", person.Roles.Select(r => System.Net.WebUtility.HtmlEncode(r?.Name ?? "-")));
+                                            }
                                         }
-                                        else
-                                        {
-                                            <span class="text-muted">-</span>
-                                        }
+                                        @Html.Raw(rolesHtml)
+                                    </td>
+                                    <td>
+                                        @(person.BirthDate?.ToString("dd/MM/yyyy") ?? "<span class=\"text-muted\">-</span>")
+                                    </td>
+                                    <td>
+                                        @(person.EnrollmentDate?.ToString("dd/MM/yyyy") ?? "<span class=\"text-muted\">-</span>")
                                     </td>
                                     <td>Idade: @person.GetAge()</td>
                                     <td class="text-end">

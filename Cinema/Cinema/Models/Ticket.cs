@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Cinema.Models
 {
@@ -11,26 +11,26 @@ namespace Cinema.Models
         public float? Price { get; set; }
         public DateTime PurchaseDate { get; set; }
         
+        public int SessionID { get; set; }
+        [ForeignKey(nameof(SessionID))]
         public Session? Session { get; set; }
-        public Client? Client { get; set; }
-        // if client is student chama StudentPrice
-        public Ticket() {
-            if (Client != null && Client.IsStudent)
-            {
-                Price = StudentPrice(Price ?? 0);
-            }
-        }
+        
+        public int? PersonID { get; set; }
+        [ForeignKey(nameof(PersonID))]
+        public Person? Person { get; set; }
+        
         public float StudentPrice(float basePrice)
         {
             return basePrice * 0.5f; // 50% discount for students
         }
+        
         public bool IsAllowedEntry(int? ageRating)
         {
             if (ageRating == null)
                 return true;
-            if (Client == null)
+            if (Person == null)
                 return false;
-            var clientAge = Client.GetAge();
+            var clientAge = Person.GetAge();
             return clientAge >= ageRating;
         }
     }

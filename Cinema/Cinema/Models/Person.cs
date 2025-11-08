@@ -1,5 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Cinema.Models
@@ -8,32 +8,38 @@ namespace Cinema.Models
     {
         [Key]
         public int ID { get; set; }
-
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
+        public DateOnly? BirthDate { get; set; }
+        public DateOnly? EnrollmentDate { get; set; }
 
-        // Alterado para DateOnly para armazenar apenas a data (sem hora)
-        public DateOnly BirthDate { get; set; }
+        public bool IsClient { get; set; } = false;
+        public bool IsActor { get; set; } = false;
+        public bool IsDirector { get; set; } = false;
+        public bool IsStudent { get; set; } = false;
 
-        // Alterado para DateOnly para armazenar apenas a data (sem hora)
-        public DateOnly EnrollmentDate { get; set; }
+        public string? CPF { get; set; }
+        public string? Email { get; set; }
+        public string? PhoneNumber { get; set; }
 
-        public Role? role { get; set; }
+        public ICollection<Role> Roles { get; set; } = new List<Role>();
+
+        public void MakeClient(string? cpf = null, string? email = null, string? phoneNumber = null)
+        {
+            IsClient = true;
+            CPF = cpf;
+            Email = email;
+            PhoneNumber = phoneNumber;
+        }
 
         public float GetAge()
         {
-            var today = DateOnly.FromDateTime(DateTime.Now);
-            var age = today.Year - BirthDate.Year;
-            if (today < BirthDate.AddYears(age))
-                age--;
+            if (BirthDate == null) return 0;
+            var today = DateTime.Today;
+            var birth = new DateTime(BirthDate.Value.Year, BirthDate.Value.Month, BirthDate.Value.Day);
+            var age = today.Year - birth.Year;
+            if (birth > today.AddYears(-age)) age--;
             return age;
         }
-    }
-    public class Client : Person
-    {
-        public int? CPF { get; set; } = null;
-        public string? Email { get; set; }
-        public int? PhoneNumber { get; set; } = null;
-        public bool IsStudent { get; set; } = false;
     }
 }

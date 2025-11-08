@@ -33,58 +33,24 @@
                     }
                     
                     <form asp-action="Create" method="post">
-                        <input type="hidden" asp-for="Session.ID" value="@session?.ID" />
+                        <input type="hidden" name="SessionID" value="@session?.ID" />
                         
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label asp-for="Client.FirstName" class="form-label fw-bold">
-                                        <i class="fas fa-user me-1"></i>Nome
+                                    <label for="PersonID" class="form-label fw-bold">
+                                        <i class="fas fa-user me-1"></i>Cliente
                                     </label>
-                                    <input asp-for="Client.FirstName" class="form-control" required />
-                                    <span asp-validation-for="Client.FirstName" class="text-danger"></span>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label asp-for="Client.LastName" class="form-label fw-bold">
-                                        <i class="fas fa-user me-1"></i>Sobrenome
-                                    </label>
-                                    <input asp-for="Client.LastName" class="form-control" required />
-                                    <span asp-validation-for="Client.LastName" class="text-danger"></span>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label asp-for="Client.Email" class="form-label fw-bold">
-                                        <i class="fas fa-envelope me-1"></i>E-mail
-                                    </label>
-                                    <input asp-for="Client.Email" type="email" class="form-control" required />
-                                    <span asp-validation-for="Client.Email" class="text-danger"></span>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label asp-for="Client.PhoneNumber" class="form-label fw-bold">
-                                        <i class="fas fa-phone me-1"></i>Telefone
-                                    </label>
-                                    <input asp-for="Client.PhoneNumber" class="form-control" />
-                                    <span asp-validation-for="Client.PhoneNumber" class="text-danger"></span>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label asp-for="Client.CPF" class="form-label fw-bold">
-                                        <i class="fas fa-id-card me-1"></i>CPF
-                                    </label>
-                                    <input asp-for="Client.CPF" class="form-control" />
-                                    <span asp-validation-for="Client.CPF" class="text-danger"></span>
+                                    <select name="PersonID" id="PersonID" class="form-control" required>
+                                        <option value="">-- Selecionar Cliente --</option>
+                                        @if (ViewBag.Clients != null)
+                                        {
+                                            @foreach (var client in ViewBag.Clients as List<SelectListItem>)
+                                            {
+                                                <option value="@client.Value">@client.Text</option>
+                                            }
+                                        }
+                                    </select>
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -92,19 +58,16 @@
                                     <label asp-for="Price" class="form-label fw-bold">
                                         <i class="fas fa-dollar-sign me-1"></i>Preço
                                     </label>
-                                    <input asp-for="Price" class="form-control" value="25.00" readonly />
+                                    <input asp-for="Price" class="form-control" value="25.00" readonly id="priceInput" />
                                     <span asp-validation-for="Price" class="text-danger"></span>
                                 </div>
                             </div>
                         </div>
                         
                         <div class="mb-4">
-                            <div class="form-check">
-                                <input asp-for="Client.IsStudent" class="form-check-input" type="checkbox" id="isStudent" />
-                                <label class="form-check-label fw-bold" for="isStudent">
-                                    <i class="fas fa-graduation-cap me-1"></i>
-                                    Sou estudante (50% de desconto)
-                                </label>
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-1"></i>
+                                <small>Estudantes recebem automaticamente 50% de desconto no preço.</small>
                             </div>
                         </div>
                         
@@ -137,13 +100,3 @@
     </div>
 </div>
 
-<script>
-document.getElementById('isStudent').addEventListener('change', function() {
-    const priceInput = document.querySelector('input[name="Price"]');
-    if (this.checked) {
-        priceInput.value = '12.50'; // 50% de desconto
-    } else {
-        priceInput.value = '25.00';
-    }
-});
-</script>

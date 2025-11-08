@@ -2,11 +2,8 @@
 
 @{
     ViewData["Title"] = "Pessoas";
-    var isClient = (Model != null && (
-        // tenta suportar nomes de propriedade com diferentes capitalizações
-        (Model.GetType().GetProperty("role") != null && (string?)Model.GetType().GetProperty("role")!.GetValue(Model) == "Cliente")
-        || (Model.GetType().GetProperty("Role") != null && (string?)Model.GetType().GetProperty("Role")!.GetValue(Model) == "Cliente")
-    ));
+    var isClient = Model != null && Model.IsClient == true;
+    var roles = (IEnumerable<Cinema.Models.Role>?)ViewBag.RolesList ?? Enumerable.Empty<Cinema.Models.Role>();
 }
 
 <div class="text-center">
@@ -16,7 +13,8 @@
 
 <div class="container">
     <div class="mx-auto">
-        <form asp-action="Create" id="personForm">
+        <form asp-action="Create" method="post" id="personForm">
+            @Html.AntiForgeryToken()
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
             <div class="form-group">
@@ -44,12 +42,20 @@
             </div>
 
             <div class="form-group">
-                <label class="control-label">Papel</label>
-                <select id="roleSelect" asp-for="role" asp-items="ViewBag.role" class="form-control">
-                    <option value="">-- Selecionar --</option>
-                </select>
-                <span asp-validation-for="role" class="text-danger"></span>
+                <label class="control-label">Papel (selecione um ou mais)</label>
+                <div>
+                    @foreach (var role in roles)
+                    {
+                        // checkbox name = selectedRoles -> será lido no controller
+                        var isChecked = Model?.Roles?.Any(r => r.ID == role.ID) == true;
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input role-checkbox" type="checkbox" name="selectedRoles" value="@role.ID" id="role_@role.ID" data-name="@role.Name" @(isChecked ? "checked" : "") />
+                            <label class="form-check-label" for="role_@role.ID">@role.Name</label>
+                        </div>
+                    }
+                </div>
             </div>
+
 
             <!-- Campos adicionais que aparecem apenas quando role == "Cliente" -->
             <div id="clientFields" style="display:@(isClient ? "block" : "none"); margin-top:15px;">
@@ -60,7 +66,7 @@
                     <!-- máscara: 000.000.000-00 -->
                     <input type="tel" id="CPF" name="CPF" class="form-control" placeholder="000.000.000-00" maxlength="14" pattern="\d{3}\.\d{3}\.\d{3}-\d{2}" />
                 </div>
-                
+
                 <div class="form-group">
                     <label>Email</label>
                     <input type="text" name="Email" class="form-control" placeholder="Email" />
@@ -87,21 +93,32 @@
 @section Scripts {
     <script>
         (function () {
-            var roleEl = document.getElementById('roleSelect');
+            // Observa checkboxes .role-checkbox e mostra/oculta clientFields quando houver "Cliente" marcado
             var clientFields = document.getElementById('clientFields');
-            if (roleEl && clientFields) {
-                roleEl.addEventListener('change', function (e) {
-                    var v = (e.target.value || '').trim();
-                    if (v === 'Cliente') {
-                        clientFields.style.display = 'block';
-                    } else {
-                        clientFields.style.display = 'none';
-                        Array.prototype.forEach.call(clientFields.querySelectorAll('input'), function (inp) {
-                            inp.value = '';
-                        });
-                    }
+            var checkboxes = document.querySelectorAll('.role-checkbox');
+
+            function updateClientFields() {
+                if (!clientFields) return;
+                var hasCliente = Array.prototype.slice.call(checkboxes || []).some(function (cb) {
+                    var name = (cb.dataset && cb.dataset.name || '').trim().toLowerCase();
+                    return name === 'cliente' && cb.checked;
                 });
+                if (hasCliente) {
+                    clientFields.style.display = 'block';
+                } else {
+                    clientFields.style.display = 'none';
+                    Array.prototype.forEach.call(clientFields.querySelectorAll('input'), function (inp) {
+                        inp.value = '';
+                    });
+                }
             }
+
+            Array.prototype.forEach.call(checkboxes, function (cb) {
+                cb.addEventListener('change', updateClientFields);
+            });
+
+            // chamar no load para refletir seleção inicial
+            updateClientFields();
 
             // --- Formatação CPF e Telefone ---
             var cpfEl = document.getElementById('CPF');
@@ -120,13 +137,10 @@
                 if (!value) return '';
                 var v = value.replace(/\D/g, '').slice(0, 11);
                 if (v.length <= 10) {
-                    // formato (00) 0000-0000
                     v = v.replace(/(\d{2})(\d{4})(\d{0,4})/, '($1) $2-$3').trim();
                 } else {
-                    // formato (00) 00000-0000
                     v = v.replace(/(\d{2})(\d{5})(\d{0,4})/, '($1) $2-$3').trim();
                 }
-                // remover possíveis traços finais vazios
                 v = v.replace(/-$/, '');
                 return v;
             }
@@ -137,32 +151,20 @@
                     var start = el.selectionStart;
                     var oldLen = el.value.length;
                     el.value = formatter(el.value);
-                    // tentativa simples de manter caret ao final
                     var newLen = el.value.length;
                     var diff = newLen - oldLen;
-                    try {
-                        el.setSelectionRange(start + diff, start + diff);
-                    } catch {}
+                    try { el.setSelectionRange(start + diff, start + diff); } catch {}
                 });
-                // garantir formatação no blur/paste
                 el.addEventListener('blur', function () { el.value = formatter(el.value); });
-                el.addEventListener('paste', function () {
-                    setTimeout(function () { el.value = formatter(el.value); }, 0);
-                });
+                el.addEventListener('paste', function () { setTimeout(function () { el.value = formatter(el.value); }, 0); });
             }
 
             attachFormatting(cpfEl, formatCPF);
             attachFormatting(phoneEl, formatPhone);
 
-            // opcional: ao submeter, limpa caracteres não numéricos se você preferir enviar apenas dígitos
             var form = document.getElementById('personForm');
             if (form) {
-                form.addEventListener('submit', function () {
-                    // se quiser enviar só dígitos:
-                    // if (cpfEl) cpfEl.value = (cpfEl.value || '').replace(/\D/g, '');
-                    // if (phoneEl) phoneEl.value = (phoneEl.value || '').replace(/\D/g, '');
-                    // deixando formatado por padrão
-                });
+                form.addEventListener('submit', function () { /* opcional cleanup */ });
             }
         })();
     </script>

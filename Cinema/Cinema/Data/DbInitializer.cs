@@ -1,4 +1,5 @@
 ﻿using Cinema.Models;
+using System.Linq;
 
 namespace Cinema.Data
 {
@@ -7,19 +8,6 @@ namespace Cinema.Data
         public static void Initialize(CinemaContext context)
         {
             // NÃO chamar EnsureCreated() quando usamos migrations. O Program.cs já chama Database.Migrate().
-
-            // Seed Roles se vazio
-            if (!context.Roles.Any())
-            {
-                var roles = new Role[]
-                {
-                    new Role { Name = "Ator" },
-                    new Role { Name = "Diretor" },
-                    new Role { Name = "Cliente" }
-                };
-                context.Roles.AddRange(roles);
-                context.SaveChanges();
-            }
 
             // Seed AgeRating se vazio
             // Usar context.Set<AgeRating>() para não depender de uma propriedade DbSet chamada AgeRating
@@ -35,6 +23,20 @@ namespace Cinema.Data
                     new AgeRating { Rating = "18" }
                 };
                 context.Set<AgeRating>().AddRange(ages);
+                context.SaveChanges();
+            }
+
+            // Seed Roles se vazio (Cliente, Ator, Diretor, Estudante)
+            if (!context.Roles.Any())
+            {
+                var roles = new Role[]
+                {
+                    new Role { Name = "Cliente" },
+                    new Role { Name = "Ator" },
+                    new Role { Name = "Diretor" },
+                    new Role { Name = "Estudante" }
+                };
+                context.Roles.AddRange(roles);
                 context.SaveChanges();
             }
 

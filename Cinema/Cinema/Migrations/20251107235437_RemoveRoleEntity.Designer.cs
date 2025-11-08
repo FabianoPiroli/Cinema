@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Cinema.Migrations
 {
     [DbContext(typeof(CinemaContext))]
-    partial class CinemaContextModelSnapshot : ModelSnapshot
+    [Migration("20251107235437_RemoveRoleEntity")]
+    partial class RemoveRoleEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -90,16 +93,16 @@ namespace Cinema.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
 
-                    b.Property<DateOnly?>("BirthDate")
+                    b.Property<DateTime>("BirthDate")
                         .HasColumnType("date");
 
-                    b.Property<string>("CPF")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int?>("CPF")
+                        .HasColumnType("int");
 
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateOnly?>("EnrollmentDate")
+                    b.Property<DateTime>("EnrollmentDate")
                         .HasColumnType("date");
 
                     b.Property<string>("FirstName")
@@ -126,7 +129,13 @@ namespace Cinema.Migrations
                     b.Property<int?>("MovieID1")
                         .HasColumnType("int");
 
-                    b.Property<string>("PhoneNumber")
+                    b.Property<string>("Nationality")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("PhoneNumber")
+                        .HasColumnType("int");
+
+                    b.Property<string>("RoleName")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("ID");
@@ -136,28 +145,6 @@ namespace Cinema.Migrations
                     b.HasIndex("MovieID1");
 
                     b.ToTable("Person", (string)null);
-                });
-
-            modelBuilder.Entity("Cinema.Models.Role", b =>
-                {
-                    b.Property<int>("ID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("PersonID")
-                        .HasColumnType("int");
-
-                    b.HasKey("ID");
-
-                    b.HasIndex("PersonID");
-
-                    b.ToTable("Roles");
                 });
 
             modelBuilder.Entity("Cinema.Models.Room", b =>
@@ -264,13 +251,6 @@ namespace Cinema.Migrations
                         .HasForeignKey("MovieID1");
                 });
 
-            modelBuilder.Entity("Cinema.Models.Role", b =>
-                {
-                    b.HasOne("Cinema.Models.Person", null)
-                        .WithMany("Roles")
-                        .HasForeignKey("PersonID");
-                });
-
             modelBuilder.Entity("Cinema.Models.Session", b =>
                 {
                     b.HasOne("Cinema.Models.Movie", "Movie")
@@ -314,11 +294,6 @@ namespace Cinema.Migrations
                     b.Navigation("Directors");
 
                     b.Navigation("Genres");
-                });
-
-            modelBuilder.Entity("Cinema.Models.Person", b =>
-                {
-                    b.Navigation("Roles");
                 });
 
             modelBuilder.Entity("Cinema.Models.Session", b =>

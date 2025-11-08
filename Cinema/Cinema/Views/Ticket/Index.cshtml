@@ -57,12 +57,12 @@
                                 Comprado em: @ticket.PurchaseDate.ToString("dd/MM/yyyy HH:mm")
                             </p>
                             
-                            @if (ticket.Client != null)
+                            @if (ticket.Person != null)
                             {
                                 <p class="card-text text-muted mb-3">
                                     <i class="fas fa-user me-1"></i>
-                                    @ticket.Client.FirstName @ticket.Client.LastName
-                                    @if (ticket.Client.IsStudent)
+                                    @ticket.Person.FirstName @ticket.Person.LastName
+                                    @if (ticket.Person.IsStudent)
                                     {
                                         <span class="badge bg-success ms-2">Estudante</span>
                                     }

@@ -15,7 +15,7 @@ namespace Cinema.Repository
         {
             return await _context.Tickets
                 .Include(t => t.Session)
-                .Include(t => t.Client)
+                .Include(t => t.Person)
                 .ToListAsync();
         }
 
@@ -23,7 +23,7 @@ namespace Cinema.Repository
         {
             return await _context.Tickets
                 .Include(t => t.Session)
-                .Include(t => t.Client)
+                .Include(t => t.Person)
                 .FirstOrDefaultAsync(t => t.ID == id);
         }
 
@@ -31,8 +31,8 @@ namespace Cinema.Repository
         {
             return await _context.Tickets
                 .Include(t => t.Session)
-                .Include(t => t.Client)
-                .Where(t => t.Session.ID == sessionId)
+                .Include(t => t.Person)
+                .Where(t => t.SessionID == sessionId)
                 .ToListAsync();
         }
 

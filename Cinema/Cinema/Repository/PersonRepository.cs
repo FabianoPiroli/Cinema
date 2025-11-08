@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Cinema.Models;
 using Cinema.Data;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace Cinema.Repository
 {
@@ -30,35 +31,31 @@ namespace Cinema.Repository
             await _context.SaveChangesAsync();
         }
 
-        // Retorna um único registro por ID (método auxiliar, opcional se a interface não exigir)
         public async Task<Person?> GetById(int personId)
         {
             return await _context.Persons
-                .Include(p => p.role)
+                .Include(p => p.Roles)
                 .FirstOrDefaultAsync(p => p.ID == personId);
         }
 
-        // Retorna todas as pessoas
         public async Task<List<Person>> GetAll()
         {
             return await _context.Persons
-                .Include(p => p.role)
-                .ToListAsync(); 
+                .Include(p => p.Roles)
+                .ToListAsync();
         }
 
-        // Retorna pessoas cujo nome ou sobrenome contenha a string fornecida
         public async Task<List<Person>> GetByName(string name)
         {
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Nome não pode ser nulo ou vazio.", nameof(name));
             return await _context.Persons
-                .Include(p => p.role)
+                .Include(p => p.Roles)
                 .Where(p => (p.FirstName != null && p.FirstName.Contains(name)) ||
                             (p.LastName != null && p.LastName.Contains(name)) ||
                             ((p.FirstName != null && p.LastName != null) && (p.FirstName + " " + p.LastName).Contains(name)))
                 .ToListAsync();
         }
 
-        // Atualiza uma pessoa existente
         public async Task Update(Person person)
         {
             if (person is null) throw new ArgumentNullException(nameof(person));
