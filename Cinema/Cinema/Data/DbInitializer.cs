@@ -40,6 +40,27 @@ namespace Cinema.Data
                 context.SaveChanges();
             }
 
+            if (!context.Genres.Any())
+            {
+                var genres = new Genre[]
+                {
+                    new Genre { Name = "Ação" },
+                    new Genre { Name = "Comédia" },
+                    new Genre { Name = "Drama" },
+                    new Genre { Name = "Romance" },
+                    new Genre { Name = "Terror" },
+                    new Genre { Name = "Ficção Científica" },
+                    new Genre { Name = "Animação" },
+                    new Genre { Name = "Documentário" },
+                    new Genre { Name = "Suspense" },
+                    new Genre { Name = "Fantasia" },
+                    new Genre { Name = "Aventura" },
+                    new Genre { Name = "Musical" }
+                };
+                context.Genres.AddRange(genres);
+                context.SaveChanges();
+            }
+
             // Look for any persons.
             if (context.Persons.Any())
             {

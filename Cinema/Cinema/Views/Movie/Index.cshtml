@@ -5,6 +5,11 @@
 }
 
 <div class="container py-5">
+
+    <form id="deleteForm" method="post" style="display:none">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="id" value="" />
+    </form>
     <div class="row mb-5">
         <div class="col-12 text-center">
             <h1 class="display-4 fw-bold mb-3">
@@ -66,6 +71,19 @@
                                 <i class="fas fa-clock me-1"></i>
                                 @movie.DurationInMinutes minutos
                             </p>
+
+                            @{
+                                var ageDisplay = movie.AgeRating?.Rating;
+                                if (string.IsNullOrWhiteSpace(ageDisplay) || ageDisplay == "0")
+                                {
+                                    ageDisplay = "Não informada";
+                                }
+                            }
+                            <p class="card-text text-muted">
+                                Classificação indicativa:
+                                <span class="fw-bold ms-1">@ageDisplay</span>
+                            </p>
+
                             @if (movie.Genres != null && movie.Genres.Any())
                             {
                                 <div class="mb-3">
@@ -83,10 +101,15 @@
                                 </p>
                             }
                             <div class="mt-auto">
-                                <a asp-action="Details" asp-route-id="@movie.ID" 
-                                   class="btn btn-warning w-100">
-                                    <i class="fas fa-info-circle me-1"></i>Ver Detalhes
-                                </a>
+                                <div class="d-flex gap-2 flex-column flex-sm-row">
+                                    <a asp-action="Update" asp-route-id="@movie.ID"
+                                       class="btn btn-warning flex-fill">
+                                        <i class="fa-solid fa-pen me-1"></i>Editar
+                                    </a>
+                                    <a href="#" class="btn btn-danger flex-fill delete-link" data-id="@movie.ID">
+                                        <i class="fa-solid fa-trash me-1"></i>Excluir
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -102,3 +125,26 @@
         </div>
     }
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.delete-link').forEach(function (el) {
+            el.addEventListener('click', function (e) {
+                e.preventDefault();
+                if (!confirm('Excluir filme?')) return;
+                var id = this.dataset.id;
+                var form = document.getElementById('deleteForm');
+                form.action = '/Movie/Delete/' + id;
+                var idInput = form.querySelector('input[name="id"]');
+                if (!idInput) {
+                    idInput = document.createElement('input');
+                    idInput.type = 'hidden';
+                    idInput.name = 'id';
+                    form.appendChild(idInput);
+                }
+                idInput.value = id;
+                form.submit();
+            });
+        });
+    });
+</script>

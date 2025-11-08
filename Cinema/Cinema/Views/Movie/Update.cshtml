@@ -12,8 +12,10 @@
 <div class="container">
 
     <div class="mx-auto">
-        <form asp-action="Create" method="post">
+        <form asp-action="Update" method="post">
             @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="ID" />
+
             <div asp-validation-summary="ModelOnly"
                  class="text-danger"></div>
 
@@ -27,7 +29,6 @@
 
             <div class="form-group">
                 <label class="control-label">Indicação de Idade:</label>
-                <!-- usar a propriedade escalar (ID) -->
                 <select asp-for="AgeRatingID" asp-items="ViewBag.AgeRating" class="form-control">
                     <option value="">-- Selecionar --</option>
                 </select>
@@ -38,19 +39,16 @@
                 <label class="control-label">Gêneros:</label>
                 <div class="d-flex flex-wrap align-items-center">
                     @{
-                        var genres = ViewBag.Genres as IEnumerable<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>
-                                     ?? Enumerable.Empty<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>();
+                        var genres = ViewBag.Genres as IEnumerable<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem> ?? Enumerable.Empty<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>();
                     }
                     @foreach (var g in genres)
                     {
                         <div class="form-check me-3 mb-2">
-                            <!-- nome para binding: SelectedGenreIds no POST -->
-                            <input class="form-check-input" type="checkbox" name="SelectedGenreIds" value="@g.Value" id="genre_@g.Value" />
+                            <input class="form-check-input" type="checkbox" name="SelectedGenreIds" value="@g.Value" id="genre_@g.Value" @(g.Selected ? "checked=\"checked\"" : "") />
                             <label class="form-check-label" for="genre_@g.Value">@g.Text</label>
                         </div>
                     }
                 </div>
-                <!-- validação customizada (ajuste no servidor conforme necessário) -->
                 <span class="text-danger"></span>
             </div>
 
@@ -59,12 +57,12 @@
                 <div class="d-flex flex-wrap align-items-center">
                     @{
                         var actors = ViewBag.Actors as IEnumerable<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>
-                                     ?? Enumerable.Empty<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>();
+                        ?? Enumerable.Empty<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>();
                     }
                     @foreach (var a in actors)
                     {
                         <div class="form-check me-3 mb-2">
-                            <input class="form-check-input" type="checkbox" name="SelectedActorIds" value="@a.Value" id="actor_@a.Value" />
+                            <input class="form-check-input" type="checkbox" name="SelectedActorIds" value="@a.Value" id="actor_@a.Value" @(a.Selected ? "checked=\"checked\"" : "") />
                             <label class="form-check-label" for="actor_@a.Value">@a.Text</label>
                         </div>
                     }
@@ -77,12 +75,12 @@
                 <div class="d-flex flex-wrap align-items-center">
                     @{
                         var directors = ViewBag.Directors as IEnumerable<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>
-                                        ?? Enumerable.Empty<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>();
+                        ?? Enumerable.Empty<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>();
                     }
                     @foreach (var d in directors)
                     {
                         <div class="form-check me-3 mb-2">
-                            <input class="form-check-input" type="checkbox" name="SelectedDirectorIds" value="@d.Value" id="director_@d.Value" />
+                            <input class="form-check-input" type="checkbox" name="SelectedDirectorIds" value="@d.Value" id="director_@d.Value" @(d.Selected ? "checked=\"checked\"" : "") />
                             <label class="form-check-label" for="director_@d.Value">@d.Text</label>
                         </div>
                     }

@@ -13,10 +13,11 @@ namespace Cinema.Repository
         }
         public async Task<List<Movie>> GetAll()
         {
-            return await _context.Movies // Verificar contexto, se é movies e tal DONKEY
+            return await _context.Movies
                 .Include(m => m.Genres)
                 .Include(m => m.Actors)
                 .Include(m => m.Directors)
+                .Include(m => m.AgeRating) // <--- incluir AgeRating aqui
                 .ToListAsync();
         }
 
@@ -26,6 +27,7 @@ namespace Cinema.Repository
                 .Include(m => m.Genres)
                 .Include(m => m.Actors)
                 .Include(m => m.Directors)
+                .Include(m => m.AgeRating) // <--- e aqui
                 .FirstOrDefaultAsync(m => m.ID == id);
         }
 

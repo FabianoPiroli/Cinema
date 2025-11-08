@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Cinema.Models
 {
@@ -8,9 +9,14 @@ namespace Cinema.Models
         public int ID { get; set; }
         public string? Title { get; set; }
         public int DurationInMinutes { get; set; }
+        public int? AgeRatingID { get; set; }
+
+        [ForeignKey(nameof(AgeRatingID))]
         public AgeRating? AgeRating { get; set; }
-        public List<Genre>? Genres { get; set; }
-        public List<Person>? Actors { get; set; }
-        public List<Person>? Directors { get; set; }
+
+        // coleções many-to-many
+        public List<Genre> Genres { get; set; } = new();
+        public List<Person> Actors { get; set; } = new();
+        public List<Person> Directors { get; set; } = new();
     }
 }

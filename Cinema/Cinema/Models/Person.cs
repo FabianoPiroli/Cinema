@@ -23,6 +23,8 @@ namespace Cinema.Models
         public string? PhoneNumber { get; set; }
 
         public ICollection<Role> Roles { get; set; } = new List<Role>();
+        public ICollection<Movie> ActedMovies { get; set; } = new List<Movie>();
+        public ICollection<Movie> DirectedMovies { get; set; } = new List<Movie>();
 
         public void MakeClient(string? cpf = null, string? email = null, string? phoneNumber = null)
         {
