@@ -40,6 +40,19 @@ namespace Cinema.Data
                 context.SaveChanges();
             }
 
+            if (!context.Rooms.Any())
+            {
+                var rooms = new Room[]
+                {
+                    new Room { RoomNumber = 1, Capacity = 50 },
+                    new Room { RoomNumber = 2, Capacity = 60 },
+                    new Room { RoomNumber = 3, Capacity = 40 },
+                    new Room { RoomNumber = 4, Capacity = 80 }
+                };
+                context.Rooms.AddRange(rooms);
+                context.SaveChanges();
+            }
+
             if (!context.Genres.Any())
             {
                 var genres = new Genre[]

@@ -1,0 +1,83 @@
+﻿@model Cinema.Models.Session
+
+@{
+    ViewData["Title"] = "Criar Sessão";
+}
+
+<div class="container d-flex align-items-center py-5" style="min-height: calc(100vh - 120px);">
+    <div class="row justify-content-center w-100">
+        <div class="col-lg-8 col-md-10">
+            <div class="card shadow">
+                <div class="card-body">
+                    <h2 class="fw-bold mb-4">
+                        <i class="fas fa-film text-warning me-2"></i>
+                        <span id="SelectedMovieTitle">Nova Sessão</span>
+                    </h2>
+
+                    <form asp-action="Create" method="post" class="row g-3">
+                        @Html.AntiForgeryToken()
+                        <div asp-validation-summary="ModelOnly" class="text-danger col-12"></div>
+
+                        <div class="col-md-6">
+                            <label asp-for="MovieID" class="form-label">Filme</label>
+                            <select asp-for="MovieID" asp-items="ViewBag.Movies" class="form-select" id="MovieID">
+                                <option value="">-- Selecionar --</option>
+                            </select>
+                            <span asp-validation-for="MovieID" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="RoomID" class="form-label">Sala</label>
+                            <select asp-for="RoomID" asp-items="ViewBag.Rooms" class="form-select" id="RoomID">
+                                <option value="">-- Selecionar --</option>
+                            </select>
+                            <span asp-validation-for="RoomID" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="StartTime" class="form-label">Início</label>
+                            <input asp-for="StartTime" type="datetime-local" class="form-control" id="StartTime" />
+                            <span asp-validation-for="StartTime" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="EndTime" class="form-label">Fim</label>
+                            <input asp-for="EndTime" type="datetime-local" class="form-control" id="EndTime" />
+                            <span asp-validation-for="EndTime" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-12 mt-3">
+                            <button type="submit" class="btn btn-warning">Salvar</button>
+                            <a asp-action="Index" class="btn btn-secondary ms-2">Cancelar</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        var movieRatings = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(ViewBag.MovieRatings ?? new Dictionary<int, string>()));
+
+        function updateAgeRating() {
+            var select = document.getElementById('MovieID');
+            if (!select) return;
+            var movieId = select.value;
+            var rating = movieRatings[movieId] || movieRatings[parseInt(movieId)] || '';
+            document.getElementById('AgeRating').value = rating;
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            var select = document.getElementById('MovieID');
+            if (select) {
+                select.addEventListener('change', updateAgeRating);
+                // Inicializa no carregamento (se houver valor selecionado)
+                updateAgeRating();
+            }
+        });
+    </script>
+}

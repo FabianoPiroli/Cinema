@@ -24,6 +24,7 @@ namespace Cinema.Repository
         {
             return await _context.Sessions
                 .Include(s => s.Movie)
+                    .ThenInclude(m => m.AgeRating)
                 .Include(s => s.Room)
                 .Include(s => s.Tickets)
                 .FirstOrDefaultAsync(s => s.ID == id);

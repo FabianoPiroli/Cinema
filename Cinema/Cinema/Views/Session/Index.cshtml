@@ -4,6 +4,11 @@
     ViewData["Title"] = "Sessões";
 }
 
+<form id="deleteForm" asp-controller="Session" asp-action="Delete" method="post" style="display:none">
+    @Html.AntiForgeryToken()
+    <input id="deleteId" type="hidden" name="id" value="" />
+</form>
+
 <div class="container py-5">
     <div class="row mb-5">
         <div class="col-12 text-center">
@@ -35,12 +40,6 @@
                                         @session.StartTime.ToString("dd/MM/yyyy")
                                     </p>
                                 </div>
-                                <div class="col-6">
-                                    <p class="card-text text-muted mb-1">
-                                        <i class="fas fa-clock me-1"></i>
-                                        @session.StartTime.ToString("HH:mm")
-                                    </p>
-                                </div>
                             </div>
                             <p class="card-text text-muted mb-3">
                                 <i class="fas fa-door-open me-1"></i>
@@ -50,11 +49,29 @@
                                 <i class="fas fa-users me-1"></i>
                                 Capacidade: @session.Room?.Capacity lugares
                             </p>
+                            <div class="col-md-6">
+                                <h6 class="fw-bold">
+                                    <i class="fas fa-clock me-1"></i>
+                                    Horário:
+                                </h6>
+                                <p class="text-muted">@session.StartTime.ToString("HH:mm") - @session.EndTime.ToString("HH:mm")</p>
+                            </div>
                             <div class="d-grid">
-                                <a asp-action="Details" asp-route-id="@session.ID" 
-                                   class="btn btn-warning">
-                                    <i class="fas fa-info-circle me-1"></i>Ver Detalhes
-                                </a>
+                                <div class="mt-auto">
+                                    <div class="d-flex gap-2 flex-column flex-sm-row">
+                                        <a asp-action="Details" asp-route-id="@session.ID"
+                                           class="btn btn-warning">
+                                            <i class="fas fa-info-circle me-1"></i>Ver Detalhes
+                                        </a>
+                                        <a asp-action="Update" asp-route-id="@session.ID"
+                                           class="btn btn-warning flex-fill">
+                                            <i class="fa-solid fa-pen me-1"></i>Editar
+                                        </a>
+                                        <a href="#" class="btn btn-danger flex-fill delete-link" data-id="@session.ID">
+                                            <i class="fa-solid fa-trash me-1"></i>Excluir
+                                        </a>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -70,3 +87,21 @@
         </div>
     }
 </div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.delete-link').forEach(function (el) {
+                el.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    var id = this.dataset.id;
+                    if (!id) return;
+                    if (!confirm('Confirma exclusão desta sessão?')) return;
+                    var input = document.getElementById('deleteId');
+                    input.value = id;
+                    document.getElementById('deleteForm').submit();
+                });
+            });
+        });
+    </script>
+}
