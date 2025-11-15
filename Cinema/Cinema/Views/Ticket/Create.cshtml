@@ -1,7 +1,11 @@
+@using System.Globalization
 @model Cinema.Models.Ticket
 @{
     ViewData["Title"] = "Comprar Ingresso";
-    var session = ViewBag.Session as Cinema.Models.Session;
+    var initialPrice = Model?.Price.HasValue == true
+        ? Model.Price.Value.ToString("N2", CultureInfo.GetCultureInfo("pt-BR"))
+        : "25,00";
+    var sessions = ViewBag.Sessions as List<Cinema.Models.Session>;
 }
 
 <div class="container py-5">
@@ -13,7 +17,7 @@
                         <i class="fas fa-ticket-alt text-warning me-2"></i>
                         Comprar Ingresso
                     </h2>
-                    
+                 @* 
                     @if (session != null)
                     {
                         <div class="alert alert-info">
@@ -30,10 +34,48 @@
                                 Sala @session.Room?.RoomNumber
                             </p>
                         </div>
-                    }
-                    
+                        *@
+
+@* TESTANDO DONKEY *@
+                    @*
+                        <div class="alert alert-info">
+                            <h5 class="fw-bold">
+                                <i class="fas fa-film me-2"></i>
+                                @session.Movie?.Title
+                            </h5>
+                            <p class="mb-1">
+                                <i class="fas fa-calendar me-1"></i>
+                                @session.StartTime.ToString("dd/MM/yyyy") às @session.StartTime.ToString("HH:mm")
+                            </p>
+                            <p class="mb-0">
+                                <i class="fas fa-door-open me-1"></i>
+                                Sala @session.Room?.RoomNumber
+                            </p>
+                        </div>
+                        *@
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="SessionID" class="form-label fw-bold">
+                                        <i class="fas fa-user me-1"></i>Sessão
+                                    </label>
+                                    <select name="SessionID" id="SessionID" class="form-control" required>
+                                        <option value="">-- Selecionar Sessão --</option>
+                                        @if (ViewBag.Sessions != null)
+                                        {
+                                            <p>Funcionou</p>
+                                            @foreach (var session in sessions)
+                                                {
+                                                    <option value="@session.ID">Sessão @session.ID - @session.Movie?.Title - @session.Movie</option>
+                                                }
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+
+
+@* Fim DO TESTE *@
                     <form asp-action="Create" method="post">
-                        <input type="hidden" name="SessionID" value="@session?.ID" />
+                        <input type="hidden"/>
                         
                         <div class="row">
                             <div class="col-md-6">
@@ -58,7 +100,8 @@
                                     <label asp-for="Price" class="form-label fw-bold">
                                         <i class="fas fa-dollar-sign me-1"></i>Preço
                                     </label>
-                                    <input asp-for="Price" class="form-control" value="25.00" readonly id="priceInput" />
+                                    <!-- usar tipo text para respeitar formatação local; valor inicial formatado em pt-BR -->
+                                    <input asp-for="Price" class="form-control" id="priceInput" value="@initialPrice" />
                                     <span asp-validation-for="Price" class="text-danger"></span>
                                 </div>
                             </div>
@@ -85,12 +128,12 @@
                         </div>
                         
                         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                            <a asp-controller="Session" asp-action="Details" asp-route-id="@session?.ID" 
+                            <a asp-controller="Ticket" asp-action="Index" 
                                class="btn btn-outline-secondary me-md-2">
                                 <i class="fas fa-arrow-left me-1"></i>Voltar
                             </a>
                             <button type="submit" class="btn btn-warning">
-                                <i class="fas fa-shopping-cart me-1"></i>Comprar Ingresso
+                                <i class="fas fa-shopping-cart me-1"></i>Finalizar
                             </button>
                         </div>
                     </form>
@@ -99,4 +142,37 @@
         </div>
     </div>
 </div>
+
+<script>
+(function () {
+    const input = document.getElementById('priceInput');
+
+    function normalizeToNumber(text) {
+        // aceita "1.234,56" ou "1234.56" etc -> sempre parse para Number
+        if (!text) return 0;
+        const clean = text.replace(/\s/g, '').replace(/\./g, '').replace(',', '.');
+        const n = parseFloat(clean);
+        return isNaN(n) ? 0 : n;
+    }
+
+    function formatPTBR(n) {
+        return n.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    // formata ao carregar e ao perder foco
+    if (input) {
+        input.value = formatPTBR(normalizeToNumber(input.value));
+
+        input.addEventListener('blur', function () {
+            input.value = formatPTBR(normalizeToNumber(input.value));
+        });
+
+        // opcional: permite digitar números e separadores
+        input.addEventListener('input', function () {
+            // mantém somente dígitos, ponto e vírgula
+            this.value = this.value.replace(/[^0-9\.,]/g, '');
+        });
+    }
+})();
+</script>
 

@@ -10,6 +10,7 @@ namespace Cinema.Models
         public string? Title { get; set; }
         public int DurationInMinutes { get; set; }
         public int? AgeRatingID { get; set; }
+        public string? ImageURL { get; set; }
 
         [ForeignKey(nameof(AgeRatingID))]
         public AgeRating? AgeRating { get; set; }

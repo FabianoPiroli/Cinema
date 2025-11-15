@@ -24,24 +24,38 @@ namespace Cinema.Controllers
             return View(tickets);
         }
 
-        public async Task<IActionResult> Create(int sessionId)
+        // Agora sempre carrega a lista de sessões (ViewBag.Sessions) e os clientes.
+        // Se sessionId for fornecido, também preenche ViewBag.Session para mostrar detalhes da sessão selecionada.
+        public async Task<IActionResult> Create(int? sessionId)
         {
-            var session = await _sessionRepository.GetById(sessionId);
-            if (session == null)
-            {
-                return NotFound();
-            }
+            // Carrega todas as sessões para o dropdown
+            var sessions = await _sessionRepository.GetAll();
+            ViewBag.Sessions = sessions;
 
-            // Carrega apenas clientes para o dropdown
-            var clients = await _personRepository.GetAll();
+            // Carrega apenas clientes para o dropdown de clientes
+            var clients = await _person_repository_getall_safe();
             var clientList = clients.Where(p => p.IsClient == true).Select(p => new SelectListItem
             {
                 Value = p.ID.ToString(),
                 Text = $"{p.FirstName} {p.LastName}"
             }).ToList();
-
-            ViewBag.Session = session;
             ViewBag.Clients = clientList;
+
+            if (sessionId.HasValue)
+            {
+                var session = await _sessionRepository.GetById(sessionId.Value);
+                if (session == null)
+                {
+                    return NotFound();
+                }
+
+                ViewBag.Session = session;
+            }
+            else
+            {
+                ViewBag.Session = null;
+            }
+
             return View();
         }
 
@@ -52,7 +66,7 @@ namespace Cinema.Controllers
             if (ModelState.IsValid)
             {
                 ticket.PurchaseDate = DateTime.Now;
-                
+
                 // Aplica desconto de estudante se necessário
                 if (ticket.PersonID.HasValue)
                 {
@@ -62,27 +76,46 @@ namespace Cinema.Controllers
                         ticket.Price = ticket.StudentPrice(ticket.Price.Value);
                     }
                 }
-                
-                await _ticketRepository.Create(ticket);
+
+                await _ticket_repository_create_safe(ticket);
                 return RedirectToAction(nameof(Index));
             }
-            
-            // Recarrega dados em caso de erro
+
+            // Recarrega dados em caso de erro no ModelState: sessions e clients + sessão selecionada (se houver)
+            var sessionsReload = await _sessionRepository.GetAll();
+            ViewBag.Sessions = sessionsReload;
+
+            var clientsReload = await _person_repository_getall_safe();
+            var clientListReload = clientsReload.Where(p => p.IsClient == true).Select(p => new SelectListItem
+            {
+                Value = p.ID.ToString(),
+                Text = $"{p.FirstName} {p.LastName}"
+            }).ToList();
+            ViewBag.Clients = clientListReload;
+
             var session = await _sessionRepository.GetById(ticket.SessionID);
             if (session != null)
             {
-                var clients = await _personRepository.GetAll();
-                var clientList = clients.Where(p => p.IsClient == true).Select(p => new SelectListItem
-                {
-                    Value = p.ID.ToString(),
-                    Text = $"{p.FirstName} {p.LastName}"
-                }).ToList();
-                
                 ViewBag.Session = session;
-                ViewBag.Clients = clientList;
             }
-            
+            else
+            {
+                ViewBag.Session = null;
+            }
+
             return View(ticket);
+        }
+
+        // Pequenas funções auxiliares para manter o código claro e evitar duplicação de lógica
+        private async Task<List<Person>> _person_repository_getall_safe()
+        {
+            var clients = await _personRepository.GetAll();
+            return clients ?? new List<Person>();
+        }
+
+        private async Task _ticket_repository_create_safe(Ticket ticket)
+        {
+            await _ticketRepository.Create(ticket);
         }
     }
 }
