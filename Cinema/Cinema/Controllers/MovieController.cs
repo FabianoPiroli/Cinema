@@ -5,6 +5,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using Microsoft.AspNetCore.Hosting;
+using System.IO;
+using System;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 
 namespace Cinema.Controllers
 {
@@ -14,17 +19,20 @@ namespace Cinema.Controllers
         private readonly ISessionRepository _sessionRepository;
         private readonly IPersonRepository _personRepository;
         private readonly CinemaContext _context;
+        private readonly IWebHostEnvironment _env;
 
         public MovieController(
             IMovieRepository movieRepository,
             ISessionRepository sessionRepository,
             IPersonRepository personRepository,
-            CinemaContext context)
+            CinemaContext context,
+            IWebHostEnvironment env)
         {
             _movieRepository = movieRepository;
             _sessionRepository = sessionRepository;
             _personRepository = personRepository;
             _context = context;
+            _env = env;
         }
 
         public async Task<IActionResult> Index()
@@ -64,7 +72,7 @@ namespace Cinema.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Movie movie, int[] SelectedDirectorIds, int[] SelectedActorIds, int? AgeRatingId, int[] SelectedGenreIds)
+        public async Task<IActionResult> Create(Movie movie, int[] SelectedDirectorIds, int[] SelectedActorIds, int? AgeRatingId, int[] SelectedGenreIds, IFormFile? CoverImage)
         {
             // associa atores selecionados
             if (SelectedActorIds?.Length > 0)
@@ -109,6 +117,36 @@ namespace Cinema.Controllers
                 movie.Genres = selectedGenres;
             }
 
+            // --- salvar arquivo em wwwroot/uploads (se houver) ---
+            // fallback para Request.Form.Files caso o binding IFormFile não tenha ocorrido
+            var file = CoverImage ?? Request.Form.Files["CoverImage"] ?? Request.Form.Files.FirstOrDefault();
+            if (file != null && file.Length > 0)
+            {
+                var allowed = new[] { "image/jpeg", "image/png", "image/gif", "image/jpg" };
+                if (!allowed.Contains(file.ContentType))
+                {
+                    // colocar erro no nível do modelo para aparecer no summary
+                    ModelState.AddModelError(string.Empty, "Tipo de arquivo não permitido. Tipos permitidos: JPG, PNG, GIF.");
+                }
+                else if (file.Length > 5 * 1024 * 1024)
+                {
+                    ModelState.AddModelError(string.Empty, "Arquivo muito grande (máx 5MB).");
+                }
+                else
+                {
+                    var ext = Path.GetExtension(file.FileName);
+                    var fileName = $"{Guid.NewGuid()}{ext}";
+                    var uploads = Path.Combine(_env.WebRootPath, "uploads");
+                    Directory.CreateDirectory(uploads);
+                    var filePath = Path.Combine(uploads, fileName);
+                    using (var fs = new FileStream(filePath, FileMode.Create))
+                    {
+                        await file.CopyToAsync(fs);
+                    }
+                    movie.ImageURL = "/uploads/" + fileName;
+                }
+            }
+
             if (ModelState.IsValid)
             {
                 await _movieRepository.Create(movie);
@@ -151,7 +189,6 @@ namespace Cinema.Controllers
             return RedirectToAction("Index");
         }
 
-        // --- Adicionado: Update GET
         [HttpGet]
         public async Task<IActionResult> Update(int id)
         {
@@ -165,7 +202,6 @@ namespace Cinema.Controllers
 
             var persons = await _personRepository.GetAll() ?? Enumerable.Empty<Person>();
 
-            // marcar atores/diretores selecionados
             ViewBag.Actors = persons
                 .Where(p => p.IsActor)
                 .Select(p => new SelectListItem
@@ -191,7 +227,7 @@ namespace Cinema.Controllers
                 .ToListAsync();
             ViewBag.AgeRating = new SelectList(ageRatings, "ID", "Rating", movie.AgeRatingID);
 
-            // marcar gêneros selecionados
+            // marcar g?neros selecionados
             var genres = await _context.Set<Genre>()
                 .OrderBy(g => g.ID)
                 .ToListAsync();
@@ -210,7 +246,7 @@ namespace Cinema.Controllers
         // --- Adicionado: Update POST
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Update(Movie movie, int[] SelectedDirectorIds, int[] SelectedActorIds, int? AgeRatingId, int[] SelectedGenreIds)
+        public async Task<IActionResult> Update(Movie movie, int[] SelectedDirectorIds, int[] SelectedActorIds, int? AgeRatingId, int[] SelectedGenreIds, IFormFile? CoverImage)
         {
             if (!ModelState.IsValid)
             {
@@ -297,6 +333,47 @@ namespace Cinema.Controllers
             {
                 var genres = await _context.Genres.Where(g => SelectedGenreIds.Contains(g.ID)).ToListAsync();
                 existing.Genres.AddRange(genres);
+            }
+
+            // --- salvar novo arquivo se enviado ---
+            if (CoverImage != null && CoverImage.Length > 0)
+            {
+                var allowed = new[] { "image/jpeg", "image/png", "image/gif" };
+                if (!allowed.Contains(CoverImage.ContentType))
+                {
+                    ModelState.AddModelError("CoverImage", "Tipo de arquivo não permitido.");
+                }
+                else if (CoverImage.Length > 5 * 1024 * 1024)
+                {
+                    ModelState.AddModelError("CoverImage", "Arquivo muito grande (máx 5MB).");
+                }
+                else
+                {
+                    // tenta remover arquivo antigo (somente se estiver em /uploads/)
+                    try
+                    {
+                        if (!string.IsNullOrEmpty(existing.ImageURL) && existing.ImageURL.StartsWith("/uploads/"))
+                        {
+                            var oldPath = Path.Combine(_env.WebRootPath, existing.ImageURL.TrimStart('/').Replace('/', Path.DirectorySeparatorChar));
+                            if (System.IO.File.Exists(oldPath))
+                            {
+                                System.IO.File.Delete(oldPath);
+                            }
+                        }
+                    }
+                    catch { /* ignore erros ao deletar arquivo antigo */ }
+
+                    var ext = Path.GetExtension(CoverImage.FileName);
+                    var fileName = $"{Guid.NewGuid()}{ext}";
+                    var uploads = Path.Combine(_env.WebRootPath, "uploads");
+                    Directory.CreateDirectory(uploads);
+                    var filePath = Path.Combine(uploads, fileName);
+                    using (var fs = new FileStream(filePath, FileMode.Create))
+                    {
+                        await CoverImage.CopyToAsync(fs);
+                    }
+                    existing.ImageURL = "/uploads/" + fileName;
+                }
             }
 
             // salvar

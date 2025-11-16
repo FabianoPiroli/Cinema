@@ -12,15 +12,19 @@
 <div class="container">
 
     <div class="mx-auto">
-        <form asp-action="Create" method="post">
+        <form asp-action="Create" method="post" enctype="multipart/form-data">
             @Html.AntiForgeryToken()
-            <div asp-validation-summary="ModelOnly"
-                 class="text-danger"></div>
+            <div asp-validation-summary="All" class="text-danger"></div>
 
             <div class="form-group">
                 <label class="control-label">Endereço URL da capa:</label>
                 <input asp-for="ImageURL" class="form-control" />
                 <span asp-validation-for="ImageURL" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label">Ou envie um arquivo de imagem (PNG/JPEG/GIF):</label>
+                <input type="file" name="CoverImage" accept="image/*" class="form-control" />
             </div>
 
             <div class="form-group">

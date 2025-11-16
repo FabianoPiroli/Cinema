@@ -1,7 +1,7 @@
 @using System.Globalization
 @model Cinema.Models.Ticket
 @{
-    ViewData["Title"] = "Gerar Ingresso";
+    ViewData["Title"] = "Alterar Ingresso";
     var initialPrice = Model?.Price.HasValue == true
         ? Model.Price.Value.ToString("N2", CultureInfo.GetCultureInfo("pt-BR"))
         : "25,00";
@@ -16,10 +16,10 @@
                 <div class="card-body">
                     <h2 class="fw-bold mb-4 text-center">
                         <i class="fas fa-ticket-alt text-warning me-2"></i>
-                        Gerar Ingresso
+                        Alterar Ingresso
                     </h2>
 
-                    <form asp-action="Create" method="post">
+                    <form asp-action="Update" method="post" asp-route-id="@Model.ID">
                         @Html.AntiForgeryToken()
                         <input type="hidden" asp-for="ID" />
 
@@ -69,14 +69,14 @@
                                 </div>
                             </div>
                         </div>
-
+                        
                         <div class="mb-4">
                             <div class="alert alert-info">
                                 <i class="fas fa-info-circle me-1"></i>
                                 <small>Estudantes recebem automaticamente 50% de desconto no preço.</small>
                             </div>
                         </div>
-
+                        
                         <div class="alert alert-warning">
                             <h6 class="fw-bold">
                                 <i class="fas fa-info-circle me-1"></i>
@@ -89,14 +89,14 @@
                                 <li>Ingressos não são reembolsáveis</li>
                             </ul>
                         </div>
-
+                        
                         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                            <a asp-controller="Ticket" asp-action="Index"
+                            <a asp-controller="Ticket" asp-action="Index" 
                                class="btn btn-outline-secondary me-md-2">
                                 <i class="fas fa-arrow-left me-1"></i>Voltar
                             </a>
                             <button type="submit" class="btn btn-warning">
-                                <i class="fas fa-shopping-cart me-1"></i>Gerar
+                                <i class="fas fa-check me-1"></i>Salvar
                             </button>
                         </div>
                     </form>
@@ -107,31 +107,31 @@
 </div>
 
 <script>
-    (function () {
-        const input = document.getElementById('priceInput');
+(function () {
+    const input = document.getElementById('priceInput');
 
-        function normalizeToNumber(text) {
-            if (!text) return 0;
-            const clean = text.replace(/\s/g, '').replace(/\./g, '').replace(',', '.');
-            const n = parseFloat(clean);
-            return isNaN(n) ? 0 : n;
-        }
+    function normalizeToNumber(text) {
+        if (!text) return 0;
+        const clean = text.replace(/\s/g, '').replace(/\./g, '').replace(',', '.');
+        const n = parseFloat(clean);
+        return isNaN(n) ? 0 : n;
+    }
 
-        function formatPTBR(n) {
-            return n.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-        }
+    function formatPTBR(n) {
+        return n.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
 
-        if (input) {
+    if (input) {
+        input.value = formatPTBR(normalizeToNumber(input.value));
+
+        input.addEventListener('blur', function () {
             input.value = formatPTBR(normalizeToNumber(input.value));
+        });
 
-            input.addEventListener('blur', function () {
-                input.value = formatPTBR(normalizeToNumber(input.value));
-            });
-
-            input.addEventListener('input', function () {
-                this.value = this.value.replace(/[^0-9\.,]/g, '');
-            });
-        }
-    })();
+        input.addEventListener('input', function () {
+            this.value = this.value.replace(/[^0-9\.,]/g, '');
+        });
+    }
+})();
 </script>
 

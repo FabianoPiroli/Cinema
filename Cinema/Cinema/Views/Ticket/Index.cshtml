@@ -4,6 +4,11 @@
     ViewData["Title"] = "Ingressos";
 }
 
+<form id="deleteForm" asp-controller="Ticket" asp-action="Delete" method="post" style="display:none">
+    @Html.AntiForgeryToken()
+    <input id="deleteId" type="hidden" name="id" value="" />
+</form>
+
 <div class="container py-5">
     <div class="row mb-5">
         <div class="col-12 text-center">
@@ -70,9 +75,20 @@
                             }
                             
                             <div class="d-grid">
-                                <button class="btn btn-outline-warning" onclick="printTicket(@ticket.ID)">
-                                    <i class="fas fa-print me-1"></i>Imprimir Ingresso
-                                </button>
+                                <div class="mt-auto">
+                                    <div class="d-flex gap-2 flex-column flex-sm-row">
+                                    <a asp-action="Update" asp-route-id="@ticket.ID"
+                                       class="btn btn-warning flex-fill">
+                                        <i class="fa-solid fa-pen me-1"></i>Editar
+                                    </a>
+                                    <a href="#" class="btn btn-danger flex-fill delete-link" data-id="@ticket.ID">
+                                        <i class="fa-solid fa-trash me-1"></i>Excluir
+                                    </a>
+                                    <button class="btn btn-outline-warning" onclick="printTicket(@ticket.ID)">
+                                        <i class="fas fa-print me-1"></i>Imprimir Ingresso
+                                    </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

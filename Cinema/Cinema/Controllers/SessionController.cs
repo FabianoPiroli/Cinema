@@ -61,6 +61,7 @@ namespace Cinema.Controllers
             var session = await _sessionRepository.GetById(id);
             if (session == null) return NotFound();
 
+            // Popula selects
             var rooms = await _roomRepository.GetAll();
             ViewBag.Rooms = new SelectList(rooms, "ID", "RoomNumber", session.RoomID);
 
@@ -79,7 +80,7 @@ namespace Cinema.Controllers
                 return RedirectToAction("Index");
             }
 
-            // repopula selects antes de re-renderizar
+            // Repopula selects antes de re-renderizar
             var rooms = await _roomRepository.GetAll();
             ViewBag.Rooms = new SelectList(rooms, "ID", "RoomNumber", session.RoomID);
 

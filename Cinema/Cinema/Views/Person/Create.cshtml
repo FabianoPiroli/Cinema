@@ -31,13 +31,13 @@
 
             <div class="form-group">
                 <label class="control-label">Data de Nascimento</label>
-                <input asp-for="BirthDate" class="form-control" />
+                <input asp-for="BirthDate" class="form-control" type="text" id="BirthDate" placeholder="dd/mm/aaaa" maxlength="10" pattern="\d{2}\/\d{2}\/\d{4}" />
                 <span asp-validation-for="BirthDate" class="text-danger"></span>
             </div>
 
             <div class="form-group">
                 <label class="control-label">Data de Cadastro</label>
-                <input asp-for="EnrollmentDate" class="form-control" />
+                <p class="form-control-plaintext">@((Model?.EnrollmentDate ?? DateOnly.FromDateTime(DateTime.Now)).ToString("dd/MM/yyyy"))</p>
                 <span asp-validation-for="EnrollmentDate" class="text-danger"></span>
             </div>
 
@@ -123,6 +123,7 @@
             // --- Formatação CPF e Telefone ---
             var cpfEl = document.getElementById('CPF');
             var phoneEl = document.getElementById('PhoneNumber');
+            var birthdateEL = document.getElementById('BirthDate');
 
             function formatCPF(value) {
                 if (!value) return '';
@@ -145,6 +146,20 @@
                 return v;
             }
 
+            // formata como DD/MM/YYYY
+            function formatBirthDate(value) {
+                if (!value) return '';
+                var v = value.replace(/\D/g, '').slice(0, 8);
+                if (v.length >= 5) {
+                    // DD MM YYYY -> DD/MM/YYYY
+                    v = v.replace(/(\d{2})(\d{2})(\d{1,4})/, '$1/$2/$3');
+                } else if (v.length >= 3) {
+                    // DD MM -> DD/MM
+                    v = v.replace(/(\d{2})(\d{1,2})/, '$1/$2');
+                }
+                return v;
+            }
+
             function attachFormatting(el, formatter) {
                 if (!el) return;
                 el.addEventListener('input', function (e) {
@@ -161,6 +176,7 @@
 
             attachFormatting(cpfEl, formatCPF);
             attachFormatting(phoneEl, formatPhone);
+            attachFormatting(birthdateEL, formatBirthDate);
 
             var form = document.getElementById('personForm');
             if (form) {
