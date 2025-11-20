@@ -398,5 +398,15 @@ namespace Cinema.Controllers
             ViewBag.SearchQuery = query;
             return View("Index", filteredMovies);
         }
+
+        public async Task<IActionResult> Details(int id)
+        {
+            var movie = await _movieRepository.GetById(id);
+            if (movie == null)
+            {
+                return NotFound();
+            }
+            return View(movie);
+        }
     }
 }

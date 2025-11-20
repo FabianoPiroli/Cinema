@@ -1,112 +1,91 @@
 @model Cinema.Models.Movie
 @{
     ViewData["Title"] = "Detalhes do Filme";
-    var sessions = ViewBag.Sessions as List<Cinema.Models.Session>;
 }
 
 <div class="container py-5">
     <div class="row">
-        <div class="col-lg-4 mb-4">
+        <div class="col-lg-8">
             <div class="card shadow">
-                <div class="card-img-top bg-dark d-flex align-items-center justify-content-center" style="height: 400px;">
-                    <i class="fas fa-film fa-5x text-warning"></i>
-                </div>
                 <div class="card-body">
-                    <h3 class="card-title fw-bold">@Model.Title</h3>
-                    <p class="card-text text-muted">
-                        <i class="fas fa-clock me-1"></i>
-                        @Model.DurationInMinutes minutos
-                    </p>
-                    @if (Model.Genres != null && Model.Genres.Any())
-                    {
-                        <div class="mb-3">
-                            <h6 class="fw-bold">Gêneros:</h6>
-                            @foreach (var genre in Model.Genres)
-                            {
-                                <span class="badge bg-warning text-dark me-1 mb-1">@genre.Name</span>
-                            }
+                    <h2 class="fw-bold mb-4">
+                        <i class="fas fa-film text-warning me-2"></i>
+                        @Model?.Title
+                    </h2>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h6 class="fw-bold">
+                                <i class="fas fa-clock me-1"></i>
+                                Duração:
+                            </h6>
+                            <p class="text-muted">@Model.DurationInMinutes.ToString("HH:mm")</p>
                         </div>
+
+                        <div class="col-md-6">
+                            <h6 class="fw-bold">
+                                <i class="fas fa-clock me-1"></i>
+                                Classificação Indicativa:
+                            </h6>
+                            <p class="text-muted">@Model.AgeRating</p>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h6 class="fw-bold">
+                                <i class="fas fa-door-open me-1"></i>
+                                Gênero
+                            </h6>
+                            <p class="text-muted">Sala @Model.Genres</p>
+                        </div>
+
+                        <div class="col-md-6">
+                            <h6 class="fw-bold">
+                                <i class="fas fa-users me-1"></i>
+                                Atores
+                            </h6>
+                            <p class="text-muted">@Model.Actors</p>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h6 class="fw-bold">
+                                <i class="fas fa-users me-1"></i>
+                                Atores
+                            </h6>
+                            <p class="text-muted">@Model.Directors</p>
+                        </div>
+                    </div>
+                    @if (Model.Title != null)
+                    {
+                        <div class="mb-4">
+                            <h6 class="fw-bold">
+                                <i class="fas fa-clock me-1"></i>
+                                Duração:
+                            </h6>
+                            <p class="text-muted">@Model.DurationInMinutes minutos</p>
+                        </div>
+                        
+                        @if (Model.Genres != null && Model.Genres.Any())
+                        {
+                            <div class="mb-4">
+                                <h6 class="fw-bold">
+                                    <i class="fas fa-tags me-1"></i>
+                                    Gêneros:
+                                </h6>
+                                @foreach (var genre in Model.Genres)
+                                {
+                                    <span class="badge bg-warning text-dark me-1">@genre.Name</span>
+                                }
+                            </div>
+                        }
                     }
                 </div>
             </div>
         </div>
-        
-        <div class="col-lg-8">
-            <div class="card shadow">
-                <div class="card-body">
-                    <h4 class="fw-bold mb-4">
-                        <i class="fas fa-info-circle text-warning me-2"></i>
-                        Informações do Filme
-                    </h4>
-                    
-                    @if (Model.Actors != null && Model.Actors.Any())
-                    {
-                        <div class="mb-4">
-                            <h6 class="fw-bold">
-                                <i class="fas fa-users me-1"></i>
-                                Elenco:
-                            </h6>
-                            <p class="text-muted">@string.Join(", ", Model.Actors.Select(a => a.FirstName + " " + a.LastName))</p>
-                        </div>
-                    }
-                    
-                    @if (Model.Directors != null && Model.Directors.Any())
-                    {
-                        <div class="mb-4">
-                            <h6 class="fw-bold">
-                                <i class="fas fa-video me-1"></i>
-                                Direção:
-                            </h6>
-                            <p class="text-muted">@string.Join(", ", Model.Directors.Select(d => d.FirstName + " " + d.LastName))</p>
-                        </div>
-                    }
-                </div>
-            </div>
-            
-            @if (sessions != null && sessions.Any())
-            {
-                <div class="card shadow mt-4">
-                    <div class="card-body">
-                        <h4 class="fw-bold mb-4">
-                            <i class="fas fa-clock text-warning me-2"></i>
-                            Sessões Disponíveis
-                        </h4>
-                        <div class="row">
-                            @foreach (var session in sessions)
-                            {
-                                <div class="col-md-6 col-lg-4 mb-3">
-                                    <div class="card border-warning">
-                                        <div class="card-body text-center">
-                                            <h6 class="card-title fw-bold">@session.StartTime.ToString("dd/MM")</h6>
-                                            <p class="card-text text-muted mb-2">
-                                                <i class="fas fa-clock me-1"></i>
-                                                @session.StartTime.ToString("HH:mm")
-                                            </p>
-                                            <p class="card-text text-muted mb-3">
-                                                <i class="fas fa-door-open me-1"></i>
-                                                Sala @session.Room?.RoomNumber
-                                            </p>
-                                            <a asp-controller="Ticket" asp-action="Create" asp-route-sessionId="@session.ID" 
-                                               class="btn btn-warning btn-sm w-100">
-                                                <i class="fas fa-ticket-alt me-1"></i>Comprar Ingresso
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                            }
-                        </div>
-                    </div>
-                </div>
-            }
-            else
-            {
-                <div class="card shadow mt-4">
-                    <div class="card-body text-center">
-                        <i class="fas fa-clock fa-3x text-muted mb-3"></i>
-                        <h5 class="text-muted">Nenhuma sessão disponível para este filme</h5>
-                    </div>
-                </div>
-            }
+
         </div>
     </div>
     

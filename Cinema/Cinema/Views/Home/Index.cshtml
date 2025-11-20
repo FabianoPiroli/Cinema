@@ -14,12 +14,14 @@
                     Bem-vindo ao CineMax
                 </h1>
                 <p class="lead mb-4">Descubra os melhores filmes em cartaz e garanta já seu ingresso para uma experiência cinematográfica única.</p>
-                <a href="#movies" class="btn btn-warning btn-lg me-3">
-                    <i class="fas fa-play me-2"></i>Ver Filmes em Cartaz
-                </a>
-                <a asp-controller="Movie" asp-action="Index" class="btn btn-outline-light btn-lg">
-                    <i class="fas fa-search me-2"></i>Buscar Filmes
-                </a>
+                <nav>
+                    <a href="#movies" class="btn btn-warning btn-lg me-3 mb-3">
+                        <i class="fas fa-play me-2"></i>Ver Filmes em Cartaz
+                    </a>
+                    <a asp-controller="Movie" asp-action="Index" class="btn btn-outline-light btn-lg mb-3">
+                        <i class="fas fa-search me-2"></i>Buscar Filmes
+                    </a>
+                </nav>
             </div>
             <div class="col-lg-6 text-center">
                 <i class="fas fa-video fa-10x text-warning opacity-50"></i>
@@ -135,4 +137,3 @@
         }
     </div>
 </section>
-

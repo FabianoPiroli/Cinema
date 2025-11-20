@@ -1,0 +1,147 @@
+﻿@model Cinema.Models.Ticket
+@using System.Globalization
+@{
+    Layout = null; // Layout nulo para impressão limpa. Se quiser o layout principal, remova esta linha.
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Ingresso - @Model.ID</title>
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            color: #111;
+            margin: 20px;
+        }
+
+        main {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .ticket {
+            width: 520px;
+            border: 2px dashed #333;
+            padding: 18px;
+            border-radius: 6px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 12px;
+        }
+
+        .movie {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .meta {
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .price {
+            font-size: 18px;
+            font-weight: 700;
+            color: #b46900;
+            margin-top: 10px;
+        }
+
+        .barcode {
+            margin-top: 12px;
+            text-align: center;
+            font-family: monospace;
+            padding: 8px;
+            border-top: 1px solid #eee;
+        }
+
+        .qrcode-wrap {
+            text-align: center;
+            margin-top: 12px;
+        }
+
+
+        .small {
+            font-size: 12px;
+            color: #666;
+        }
+        @@media print {
+            body
+
+        {
+            margin: 0;
+        }
+
+        .no-print {
+            display: none;
+        }
+
+        }
+    </style>
+</head>
+<body>
+    <div class="ticket">
+        <header class="header">
+            <p class="small">CineMax</p>
+            <h1 class="movie">@(Model.Session?.Movie?.Title ?? "Título indisponível")</h1>
+            <section class="meta">
+                <p>Sessão: @Model.Session?.StartTime.ToString("dd/MM/yyyy HH:mm")</p>
+                <p>Sala: @Model.Session?.Room?.RoomNumber</p>
+            </section>
+        </header>
+
+        <main>
+            <section>
+                <p><strong>Cliente:</strong> @(Model.Person != null ? $"{Model.Person.FirstName} {Model.Person.LastName}" : "Consumidor não identificado")</p>
+                <p><strong>Data da compra:</strong> @Model.PurchaseDate.ToString("dd/MM/yyyy HH:mm")</p>
+                <p><strong>Ingresso n.º</strong> @Model.ID</p>
+                <p class="price">Preço: @((Model.Price ?? 0m).ToString("C2", CultureInfo.GetCultureInfo("pt-BR")))</p>
+            </section>
+
+
+            <section class="qrcode-wrap" aria-hidden="false">
+                <!-- QR vindo do endpoint server-side -->
+                <img src="@Url.Action("QrCode", "Ticket", new { id = Model.ID })" alt="QR Code do ingresso" width="150" height="150" />
+                <div class="small" style="margin-top:6px;">Apresente o QR na entrada</div>
+            </section>
+        </main>
+
+        <section class="alert alert-warning">
+            <h6 class="fw-bold">
+                <i class="fas fa-info-circle me-1"></i>
+                Informações Importantes:
+            </h6>
+            <ul class="mb-0 small">
+                <li>Chegue 15 minutos antes da sessão</li>
+                <li>Apresente documento de identificação</li>
+                <li>Estudantes devem apresentar carteirinha</li>
+                <li>Ingressos não são reembolsáveis</li>
+            </ul>
+        </section>
+
+        <section class="barcode">
+            <!-- Representação simples do código: aqui exibe o ID e data -->
+            ||| @Model.ID @Model.PurchaseDate.Ticks |||
+        </section>
+
+    </div>
+
+    <div style="margin-top:12px;">
+        <button class="no-print" onclick="window.print()">Imprimir</button>
+        <button class="no-print" onclick="window.close()">Fechar</button>
+    </div>
+
+    <script>
+        // Ao abrir a view em nova aba, solicitar impressão automaticamente.
+        window.addEventListener('load', function () {
+            window.print();
+        });
+    </script>
+</body>
+</html>

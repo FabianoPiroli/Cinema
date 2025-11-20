@@ -3,6 +3,8 @@ using Cinema.Repository;
 using Cinema.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using QRCoder;
+using System.Text;
 
 namespace Cinema.Controllers
 {
@@ -196,6 +198,60 @@ namespace Cinema.Controllers
             ViewBag.Session = session;
 
             return View(ticket);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var ticket = await _ticketRepository.GetById(id);
+            if (ticket == null)
+            {
+                return NotFound();
+            }
+            await _ticketRepository.Delete(ticket);
+            return RedirectToAction("Index");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Print(int? id)
+        {
+            if (!id.HasValue)
+                return BadRequest();
+
+            var ticket = await _ticketRepository.GetById(id.Value);
+            if (ticket == null)
+                return NotFound();
+
+            return View(ticket);
+        }
+
+        //Gera e retorna SVG do QR code para o ingresso
+        [HttpGet]
+        public async Task<IActionResult> QrCode(int? id, int pixelsPerModule = 4)
+        {
+            if (!id.HasValue)
+                return BadRequest();
+
+            var ticket = await _ticketRepository.GetById(id.Value);
+            if (ticket == null)
+                return NotFound();
+
+            // payload do QR:link, id, hash, etc.
+            var payload = new
+            {
+                ticketId = ticket.ID,
+                sessionId = ticket.SessionID,
+                purchaseDate = ticket.PurchaseDate.ToString("o")
+            };
+
+            var payloadString = System.Text.Json.JsonSerializer.Serialize(payload);
+
+            using var qrGenerator = new QRCodeGenerator();
+            using var qrData = qrGenerator.CreateQrCode(payloadString, QRCodeGenerator.ECCLevel.Q);
+            var svg = new SvgQRCode(qrData).GetGraphic(pixelsPerModule);
+
+            // Retorna SVG puro (ideal para impressão)
+            return Content(svg, "image/svg+xml");
         }
     }
 }

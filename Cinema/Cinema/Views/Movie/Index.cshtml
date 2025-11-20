@@ -60,57 +60,59 @@
         <div class="row">
             @foreach (var movie in Model)
             {
-                <div class="col-lg-3 col-md-5 mb-3">
-                    <div class="card movie-card h-100 shadow-sm">
-                        <img src="@movie.ImageURL" alt="@movie.Title" class="card-img-top bg-dark d-flex align-items-center justify-content-center" />
-                        <div class="card-body d-flex flex-column">
-                            <h5 class="card-title fw-bold">@movie.Title</h5>
-                            <p class="card-text text-muted">
-                                <i class="fas fa-clock me-1"></i>
-                                @movie.DurationInMinutes minutos
-                            </p>
-
-                            @{
-                                var ageDisplay = movie.AgeRating?.Rating;
-                                if (string.IsNullOrWhiteSpace(ageDisplay) || ageDisplay == "0")
-                                {
-                                    ageDisplay = "Não informada";
-                                }
-                            }
-                            <p class="card-text text-muted">
-                                Classificação indicativa:
-                                <span class="fw-bold ms-1">@ageDisplay</span>
-                            </p>
-
-                            @if (movie.Genres != null && movie.Genres.Any())
-                            {
-                                <div class="mb-3">
-                                    @foreach (var genre in movie.Genres.Take(3))
-                                    {
-                                        <span class="badge bg-warning text-dark me-1">@genre.Name</span>
-                                    }
-                                </div>
-                            }
-                            @if (movie.Actors != null && movie.Actors.Any())
-                            {
-                                <p class="card-text text-muted small">
-                                    <i class="fas fa-users me-1"></i>
-                                    @string.Join(", ", movie.Actors.Take(3).Select(a => a.FirstName + " " + a.LastName))
+                    <div class="col-lg-3 col-md-5 mb-3">
+                        <a class="link-disabled" asp-action="Details" asp-route-id="@movie.ID">
+                        <div class="card movie-card h-100 shadow-sm">
+                            <img src="@movie.ImageURL" alt="@movie.Title" class="card-img-top bg-dark d-flex align-items-center justify-content-center" />
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title fw-bold">@movie.Title</h5>
+                                <p class="card-text text-muted">
+                                    <i class="fas fa-clock me-1"></i>
+                                    @movie.DurationInMinutes minutos
                                 </p>
-                            }
-                            <div class="mt-auto">
-                                <div class="d-flex gap-2 flex-column flex-sm-row">
-                                    <a asp-action="Update" asp-route-id="@movie.ID"
-                                       class="btn btn-warning flex-fill">
-                                        <i class="fa-solid fa-pen me-1"></i>Editar
-                                    </a>
-                                    <a href="#" class="btn btn-danger flex-fill delete-link" data-id="@movie.ID">
-                                        <i class="fa-solid fa-trash me-1"></i>Excluir
-                                    </a>
+
+                                @{
+                                    var ageDisplay = movie.AgeRating?.Rating;
+                                    if (string.IsNullOrWhiteSpace(ageDisplay) || ageDisplay == "0")
+                                    {
+                                        ageDisplay = "Não informada";
+                                    }
+                                }
+                                <p class="card-text text-muted">
+                                    Classificação indicativa:
+                                    <span class="fw-bold ms-1">@ageDisplay</span>
+                                </p>
+
+                                @if (movie.Genres != null && movie.Genres.Any())
+                                {
+                                    <div class="mb-3">
+                                        @foreach (var genre in movie.Genres.Take(3))
+                                        {
+                                            <span class="badge bg-warning text-dark me-1">@genre.Name</span>
+                                        }
+                                    </div>
+                                }
+                                @if (movie.Actors != null && movie.Actors.Any())
+                                {
+                                    <p class="card-text text-muted small">
+                                        <i class="fas fa-users me-1"></i>
+                                        @string.Join(", ", movie.Actors.Take(3).Select(a => a.FirstName + " " + a.LastName))
+                                    </p>
+                                }
+                                <div class="mt-auto">
+                                    <div class="d-flex gap-2 flex-column flex-sm-row">
+                                        <a asp-action="Update" asp-route-id="@movie.ID"
+                                        class="btn btn-warning flex-fill">
+                                            <i class="fa-solid fa-pen me-1"></i>Editar
+                                        </a>
+                                        <a href="#" class="btn btn-danger flex-fill delete-link" data-id="@movie.ID" onclick="return confirm('Remover este filme?');">
+                                            <i class="fa-solid fa-trash me-1"></i>Excluir
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </a>
                 </div>
             }
         </div>

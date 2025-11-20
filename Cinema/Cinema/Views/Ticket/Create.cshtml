@@ -6,7 +6,7 @@
         ? Model.Price.Value.ToString("N2", CultureInfo.GetCultureInfo("pt-BR"))
         : "25,00";
     var sessions = ViewBag.Sessions as List<Cinema.Models.Session>;
-    var clients = ViewBag.Clients as List<SelectListItem>;
+    var clients = ViewBag.Clients as List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>;
 }
 
 <div class="container py-5">
@@ -21,13 +21,13 @@
 
                     <form asp-action="Create" method="post">
                         @Html.AntiForgeryToken()
-                        <input type="hidden" asp-for="ID" />
+                        @Html.ValidationSummary(true, "", new { @class = "text-danger mb-3" })
 
                         <div class="col-md-6 mb-3">
                             <label for="SessionID" class="form-label fw-bold">
                                 <i class="fas fa-film me-1"></i> Sessão
                             </label>
-                            <select name="SessionID" id="SessionID" class="form-control" required>
+                            <select asp-for="SessionID" id="SessionID" class="form-control" required>
                                 <option value="">-- Selecionar Sessão --</option>
                                 @if (sessions != null)
                                 {
@@ -46,15 +46,8 @@
                                     <label for="PersonID" class="form-label fw-bold">
                                         <i class="fas fa-user me-1"></i> Cliente
                                     </label>
-                                    <select name="PersonID" id="PersonID" class="form-control" required>
+                                    <select asp-for="PersonID" class="form-control" asp-items="@(clients)" required>
                                         <option value="">-- Selecionar Cliente --</option>
-                                        @if (clients != null)
-                                        {
-                                            foreach (var client in clients)
-                                            {
-                                                <option value="@client.Value" selected="@(Model?.PersonID.HasValue == true && Model.PersonID.Value.ToString() == client.Value ? "selected" : null)">@client.Text</option>
-                                            }
-                                        }
                                     </select>
                                 </div>
                             </div>
@@ -64,7 +57,7 @@
                                     <label asp-for="Price" class="form-label fw-bold">
                                         <i class="fas fa-dollar-sign me-1"></i> Preço
                                     </label>
-                                    <input asp-for="Price" class="form-control" id="priceInput" value="@initialPrice" />
+                                    <input asp-for="Price" class="form-control" id="priceInput" />
                                     <span asp-validation-for="Price" class="text-danger"></span>
                                 </div>
                             </div>
@@ -75,19 +68,6 @@
                                 <i class="fas fa-info-circle me-1"></i>
                                 <small>Estudantes recebem automaticamente 50% de desconto no preço.</small>
                             </div>
-                        </div>
-
-                        <div class="alert alert-warning">
-                            <h6 class="fw-bold">
-                                <i class="fas fa-info-circle me-1"></i>
-                                Informações Importantes:
-                            </h6>
-                            <ul class="mb-0 small">
-                                <li>Chegue 15 minutos antes da sessão</li>
-                                <li>Apresente documento de identificação</li>
-                                <li>Estudantes devem apresentar carteirinha</li>
-                                <li>Ingressos não são reembolsáveis</li>
-                            </ul>
                         </div>
 
                         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
@@ -122,7 +102,12 @@
         }
 
         if (input) {
-            input.value = formatPTBR(normalizeToNumber(input.value));
+            // se quiser iniciar com 25,00 quando não houver model:
+            if (!input.value) {
+                input.value = "25,00";
+            } else {
+                input.value = formatPTBR(normalizeToNumber(input.value));
+            }
 
             input.addEventListener('blur', function () {
                 input.value = formatPTBR(normalizeToNumber(input.value));

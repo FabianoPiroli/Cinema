@@ -4,11 +4,6 @@
     ViewData["Title"] = "Ingressos";
 }
 
-<form id="deleteForm" asp-controller="Ticket" asp-action="Delete" method="post" style="display:none">
-    @Html.AntiForgeryToken()
-    <input id="deleteId" type="hidden" name="id" value="" />
-</form>
-
 <div class="container py-5">
     <div class="row mb-5">
         <div class="col-12 text-center">
@@ -29,7 +24,7 @@
         <div class="row">
             @foreach (var ticket in Model)
             {
-                <div class="col-lg-6 col-md-6 mb-4">
+                <div class="col-lg-4 col-md-6 mb-4">
                     <div class="card ticket-card h-100 shadow-sm">
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-start mb-3">
@@ -77,16 +72,18 @@
                             <div class="d-grid">
                                 <div class="mt-auto">
                                     <div class="d-flex gap-2 flex-column flex-sm-row">
-                                    <a asp-action="Update" asp-route-id="@ticket.ID"
-                                       class="btn btn-warning flex-fill">
-                                        <i class="fa-solid fa-pen me-1"></i>Editar
-                                    </a>
-                                    <a href="#" class="btn btn-danger flex-fill delete-link" data-id="@ticket.ID">
-                                        <i class="fa-solid fa-trash me-1"></i>Excluir
-                                    </a>
-                                    <button class="btn btn-outline-warning" onclick="printTicket(@ticket.ID)">
-                                        <i class="fas fa-print me-1"></i>Imprimir Ingresso
-                                    </button>
+                                        <a asp-action="Update" asp-route-id="@ticket.ID"
+                                           class="btn btn-warning flex-fill">
+                                            <i class="fa-solid fa-pen me-1"></i>Editar
+                                        </a>
+                                        <form asp-action="Delete" asp-route-id="@ticket.ID" method="post">
+                                            <button type="submit" class="btn btn-danger flex-fill" onclick="return confirm('Remover este ingresso?');">
+                                                <i class="fa-solid fa-trash me-1"></i>Excluir
+                                            </button>
+                                        </form>
+                                        <a asp-action="Print" asp-route-id="@ticket.ID" target="_blank" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-print"></i> Imprimir Ingresso
+                                        </a>
                                     </div>
                                 </div>
                             </div>
@@ -107,10 +104,3 @@
         </div>
     }
 </div>
-
-<script>
-function printTicket(ticketId) {
-    // Implementar funcionalidade de impressão
-    alert('Funcionalidade de impressão será implementada em breve!');
-}
-</script>
