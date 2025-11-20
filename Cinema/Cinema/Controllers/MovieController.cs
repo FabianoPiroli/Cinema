@@ -118,7 +118,6 @@ namespace Cinema.Controllers
             }
 
             // --- salvar arquivo em wwwroot/uploads (se houver) ---
-            // fallback para Request.Form.Files caso o binding IFormFile não tenha ocorrido
             var file = CoverImage ?? Request.Form.Files["CoverImage"] ?? Request.Form.Files.FirstOrDefault();
             if (file != null && file.Length > 0)
             {
@@ -227,7 +226,7 @@ namespace Cinema.Controllers
                 .ToListAsync();
             ViewBag.AgeRating = new SelectList(ageRatings, "ID", "Rating", movie.AgeRatingID);
 
-            // marcar g?neros selecionados
+            // marcar gêneros selecionados
             var genres = await _context.Set<Genre>()
                 .OrderBy(g => g.ID)
                 .ToListAsync();
@@ -297,6 +296,7 @@ namespace Cinema.Controllers
             // atualizar campos escalares
             existing.Title = movie.Title;
             existing.DurationInMinutes = movie.DurationInMinutes;
+            existing.Synopsis = movie.Synopsis; // <-- ADICIONADO: garantir que a sinopse seja atualizada
 
             // age rating
             if (AgeRatingId.HasValue)

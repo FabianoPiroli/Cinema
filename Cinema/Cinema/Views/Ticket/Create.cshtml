@@ -9,14 +9,14 @@
     var clients = ViewBag.Clients as List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>;
 }
 
-<div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-lg-8">
+<div class="container d-flex align-items-center py-5" style="min-height: calc(100vh - 120px);">
+    <div class="row justify-content-center w-100">
+        <div class="col-lg-8 col-md-10">
             <div class="card shadow">
                 <div class="card-body">
                     <h2 class="fw-bold mb-4 text-center">
                         <i class="fas fa-ticket-alt text-warning me-2"></i>
-                        Gerar Ingresso
+                        Novo Ingresso
                     </h2>
 
                     <form asp-action="Create" method="post">

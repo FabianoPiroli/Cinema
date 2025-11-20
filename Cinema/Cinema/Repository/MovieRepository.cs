@@ -17,7 +17,7 @@ namespace Cinema.Repository
                 .Include(m => m.Genres)
                 .Include(m => m.Actors)
                 .Include(m => m.Directors)
-                .Include(m => m.AgeRating) // <--- incluir AgeRating aqui
+                .Include(m => m.AgeRating)
                 .ToListAsync();
         }
 
@@ -27,7 +27,7 @@ namespace Cinema.Repository
                 .Include(m => m.Genres)
                 .Include(m => m.Actors)
                 .Include(m => m.Directors)
-                .Include(m => m.AgeRating) // <--- e aqui
+                .Include(m => m.AgeRating)
                 .FirstOrDefaultAsync(m => m.ID == id);
         }
 
