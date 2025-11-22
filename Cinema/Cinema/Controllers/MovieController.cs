@@ -124,7 +124,6 @@ namespace Cinema.Controllers
                 var allowed = new[] { "image/jpeg", "image/png", "image/gif", "image/jpg" };
                 if (!allowed.Contains(file.ContentType))
                 {
-                    // colocar erro no nível do modelo para aparecer no summary
                     ModelState.AddModelError(string.Empty, "Tipo de arquivo não permitido. Tipos permitidos: JPG, PNG, GIF.");
                 }
                 else if (file.Length > 5 * 1024 * 1024)
@@ -242,7 +241,6 @@ namespace Cinema.Controllers
             return View(movie);
         }
 
-        // --- Adicionado: Update POST
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Update(Movie movie, int[] SelectedDirectorIds, int[] SelectedActorIds, int? AgeRatingId, int[] SelectedGenreIds, IFormFile? CoverImage)

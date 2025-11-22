@@ -85,7 +85,7 @@ namespace Cinema.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            // Recarrega dados em caso de erro no ModelState: sessions e clients + sessão selecionada (se houver)
+            // Recarrega dropdowns em caso de erro
             var sessionsReload = await _sessionRepository.GetAll();
             ViewBag.Sessions = sessionsReload;
 
@@ -119,7 +119,7 @@ namespace Cinema.Controllers
             await _ticketRepository.Create(ticket);
         }
 
-        // --- CORREÇÃO: Update GET e POST (usando ticket id) ---
+        // Editar ingresso
         [HttpGet]
         public async Task<IActionResult> Update(int? id)
         {
@@ -225,7 +225,7 @@ namespace Cinema.Controllers
             return View(ticket);
         }
 
-        //Gera e retorna SVG do QR code para o ingresso
+        //Gera QR code para o ingresso
         [HttpGet]
         public async Task<IActionResult> QrCode(int? id, int pixelsPerModule = 4)
         {
@@ -236,7 +236,6 @@ namespace Cinema.Controllers
             if (ticket == null)
                 return NotFound();
 
-            // payload do QR:link, id, hash, etc.
             var payload = new
             {
                 ticketId = ticket.ID,
@@ -250,7 +249,6 @@ namespace Cinema.Controllers
             using var qrData = qrGenerator.CreateQrCode(payloadString, QRCodeGenerator.ECCLevel.Q);
             var svg = new SvgQRCode(qrData).GetGraphic(pixelsPerModule);
 
-            // Retorna SVG puro (ideal para impressão)
             return Content(svg, "image/svg+xml");
         }
     }

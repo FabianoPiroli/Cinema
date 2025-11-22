@@ -54,7 +54,6 @@
                 <div>
                     @foreach (var role in roles)
                     {
-                        // checkbox name = selectedRoles -> será lido no controller
                         var isChecked = Model?.Roles?.Any(r => r.ID == role.ID) == true;
                         <div class="form-check form-check-inline">
                             <input class="form-check-input role-checkbox" type="checkbox" name="selectedRoles" value="@role.ID" id="role_@role.ID" data-name="@role.Name" @(isChecked ? "checked" : "") />

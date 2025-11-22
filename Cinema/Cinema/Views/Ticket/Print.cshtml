@@ -1,7 +1,7 @@
 ﻿@model Cinema.Models.Ticket
 @using System.Globalization
 @{
-    Layout = null; // Layout nulo para impressão limpa. Se quiser o layout principal, remova esta linha.
+    Layout = null;
 }
 
 <!DOCTYPE html>
@@ -106,7 +106,6 @@
 
 
             <section class="qrcode-wrap" aria-hidden="false">
-                <!-- QR vindo do endpoint server-side -->
                 <img src="@Url.Action("QrCode", "Ticket", new { id = Model.ID })" alt="QR Code do ingresso" width="150" height="150" />
                 <div class="small" style="margin-top:6px;">Apresente o QR na entrada</div>
             </section>

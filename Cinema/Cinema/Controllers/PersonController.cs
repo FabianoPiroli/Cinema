@@ -29,7 +29,7 @@ namespace Cinema.Controllers
             return View(persons);
         }
 
-        // Popula ViewBag.RolesList com todas as roles do banco; optionally passar selected ids
+        // Popula ViewBag.RolesList com todas as roles do banco
         private async Task PopulateRolesAsync(IEnumerable<int>? selectedRoleIds = null)
         {
             var roles = await _context.Roles.OrderBy(r => r.Name).ToListAsync();
@@ -130,7 +130,7 @@ namespace Cinema.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Update(Person person)
         {
-            // parse selected roles ids (checkboxes name = selectedRoles)
+            // obter roles selecionadas do formulário
             var selected = Request.Form["selectedRoles"].ToArray();
             var selectedIds = selected.Select(s => int.TryParse(s, out var id) ? id : (int?)null)
                                       .Where(id => id.HasValue)
